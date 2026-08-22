@@ -26,22 +26,6 @@
             position: relative;
         }
 
-        /* 超強效隱藏 Netlify 浮水印 */
-        [class*="netlify"], 
-        iframe[src*="netlify"], 
-        .netlify-badge,
-        #netlify-badge,
-        [data-netlify-deploy-id],
-        netlify-plugin-drawer,
-        div[style*="fixed"][style*="bottom"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            z-index: -9999 !important;
-        }
-
-        /* 埃及背景圖層 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -52,7 +36,6 @@
             transition: background-image 0.5s ease;
         }
 
-        /* 暗色遮罩 */
         body::before {
             content: "";
             position: absolute;
@@ -61,7 +44,6 @@
             z-index: -1;
         }
 
-        /* 奢華玻璃卡片 */
         .egypt-card { 
             width: 90%; 
             max-width: 460px; 
@@ -184,10 +166,9 @@
             <input type="password" id="pwdInput" class="form-control egypt-input mb-2 text-center" placeholder="輸入用戶密碼">
             <input type="text" id="keyInput" class="form-control egypt-input mb-3 text-center fw-bold" placeholder="KEY-XXXXXX" style="letter-spacing: 2px;">
             
-            <button class="btn btn-egypt w-100 py-2.5 rounded-pill" onclick="handleLogin()">開啟神聖契約</button>
+            <button class="btn btn-egypt w-100 py-2.5 rounded-pill" id="loginBtn" onclick="handleLogin()">開啟神聖契約</button>
         </div>
 
-        <!-- 刮刮樂區域 -->
         <div id="scratchSection">
             <div class="scratch-container" id="scratchContainer">
                 <div class="prize-layer">
@@ -203,24 +184,23 @@
     <!-- 2. 管理員控制台 -->
     <div id="adminPage" style="display: none;">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="egypt-title mb-0" style="font-size: 18px;">⚙️ 控制台主機</h4>
+            <h4 class="egypt-title mb-0" style="font-size: 18px;">⚙️ 雲端主機控制台</h4>
             <button class="btn btn-outline-warning btn-sm rounded-pill" onclick="logoutAdmin()">登出</button>
         </div>
 
-        <!-- 授權資料設定區 -->
         <div class="card p-3 mb-3 text-start border-0" style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--egypt-gold) !important;">
-            <h6 class="text-warning fw-bold mb-2">🔑 新增授權資料：</h6>
+            <h6 class="text-warning fw-bold mb-2">🔑 新增雲端授權資料：</h6>
             <input type="text" id="subAccInput" class="form-control egypt-input mb-2" placeholder="設定子帳號">
             <input type="text" id="subPwdInput" class="form-control egypt-input mb-2" placeholder="設定子密碼">
             <input type="text" id="prizeInput" class="form-control egypt-input mb-3" placeholder="設定金額 (如：$500)">
             
-            <button class="btn btn-egypt w-100 fw-bold rounded-3" onclick="generateSubAccount()">產生金鑰與開通</button>
+            <button class="btn btn-egypt w-100 fw-bold rounded-3" id="genBtn" onclick="generateSubAccount()">產生金鑰並同步至雲端</button>
         </div>
 
         <div class="text-start">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="text-warning fw-bold mb-0">資料庫紀錄：</h6>
-                <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" onclick="clearAllData()">清空所有紀錄</button>
+                <h6 class="text-warning fw-bold mb-0">雲端同步紀錄：</h6>
+                <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" onclick="clearAllData()">清空雲端紀錄</button>
             </div>
             <div style="max-height: 150px; overflow-y: auto;">
                 <ul id="keyList" class="list-group list-group-flush"></ul>
@@ -233,41 +213,100 @@
 </div>
 
 <script>
-    // 指定背景圖片直接連結
     const DEFAULT_BG = "https://i.postimg.cc/85fGp1Rd/sai-tebg.png";
-
-    window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('bgLayer').style.backgroundImage = `url('${DEFAULT_BG}')`;
-        
-        // JS 自動強行清除 Netlify 浮水印腳本與 DOM 節點
-        const removeNetlifyBadge = () => {
-            const badges = document.querySelectorAll('[class*="netlify"], iframe[src*="netlify"], netlify-plugin-drawer, #netlify-badge');
-            badges.forEach(el => el.remove());
-        };
-        removeNetlifyBadge();
-        setInterval(removeNetlifyBadge, 500);
-    });
+    const JSONBIN_API_KEY = "$2a$10$92XGHP.lNCPqYGVXwVe1OO1/L4jOoI01kKN4TNQwrALhIOuj8tWwy"; 
 
     const ADMIN_USER = "cvv005";
     const ADMIN_PASS = "cvv111213";
 
-    function loadDB() {
-        const savedData = localStorage.getItem('scratch_db');
-        return savedData ? JSON.parse(savedData) : {};
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('bgLayer').style.backgroundImage = `url('${DEFAULT_BG}')`;
+    });
+
+    // 取得雲端 Bin ID
+    async function getBinID() {
+        let binId = localStorage.getItem('scratch_bin_id');
+        if (binId) return binId;
+
+        try {
+            const res = await fetch('https://api.jsonbin.io/v3/b', {
+                method: 'GET',
+                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            });
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                binId = data[0].record;
+                localStorage.setItem('scratch_bin_id', binId);
+                return binId;
+            }
+        } catch (e) {
+            console.error("讀取 Bin ID 失敗", e);
+        }
+        return null;
     }
 
-    function saveDB(db) {
+    // 讀取雲端資料庫
+    async function loadDB() {
+        let binId = await getBinID();
+        if (!binId) {
+            const saved = localStorage.getItem('scratch_db');
+            return saved ? JSON.parse(saved) : {};
+        }
+
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            });
+            const data = await res.json();
+            return data.record || {};
+        } catch (e) {
+            console.error("雲端載入失敗，切換至備份:", e);
+            const saved = localStorage.getItem('scratch_db');
+            return saved ? JSON.parse(saved) : {};
+        }
+    }
+
+    // 寫入雲端資料庫
+    async function saveDB(db) {
         localStorage.setItem('scratch_db', JSON.stringify(db));
+
+        try {
+            let binId = await getBinID();
+            if (!binId) {
+                const res = await fetch('https://api.jsonbin.io/v3/b', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY,
+                        'X-Bin-Private': 'true'
+                    },
+                    body: JSON.stringify(db)
+                });
+                const data = await res.json();
+                if (data.metadata && data.metadata.id) {
+                    localStorage.setItem('scratch_bin_id', data.metadata.id);
+                }
+            } else {
+                await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify(db)
+                });
+            }
+        } catch (e) {
+            console.error("雲端同步失敗:", e);
+        }
     }
 
-    function handleLogin() {
+    async function handleLogin() {
         const acc = document.getElementById('accInput').value.trim();
         const pwd = document.getElementById('pwdInput').value.trim();
         const key = document.getElementById('keyInput').value.trim().toUpperCase();
 
-        if (!acc || !pwd) {
-            return alert('請輸入帳號與密碼！');
-        }
+        if (!acc || !pwd) return alert('請輸入帳號與密碼！');
 
         if (acc === ADMIN_USER && pwd === ADMIN_PASS) {
             document.getElementById('loginPage').style.display = 'none';
@@ -277,12 +316,17 @@
             return;
         }
 
-        if (!key) {
-            return alert('請輸入金鑰！');
-        }
+        if (!key) return alert('請輸入金鑰！');
 
-        const db = loadDB();
+        const btn = document.getElementById('loginBtn');
+        btn.innerText = "連線雲端驗證中...";
+        btn.disabled = true;
+
+        const db = await loadDB();
         const user = db[acc];
+
+        btn.innerText = "開啟神聖契約";
+        btn.disabled = false;
         
         if (!user || user.password !== pwd || user.key !== key) {
             return alert('❌ 驗證失敗！帳號、密碼或金鑰錯誤。');
@@ -293,7 +337,7 @@
         }
 
         user.isUsed = true;
-        saveDB(db);
+        await saveDB(db);
 
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('scratchContainer').style.display = 'block';
@@ -303,18 +347,22 @@
         initCanvas();
     }
 
-    function generateSubAccount() {
+    async function generateSubAccount() {
         const subAcc = document.getElementById('subAccInput').value.trim();
         const subPwd = document.getElementById('subPwdInput').value.trim();
         const prize = document.getElementById('prizeInput').value.trim();
 
-        if (!subAcc || !subPwd || !prize) {
-            return alert('請填寫完整資訊！');
-        }
+        if (!subAcc || !subPwd || !prize) return alert('請填寫完整資訊！');
 
-        const db = loadDB();
+        const btn = document.getElementById('genBtn');
+        btn.innerText = "跨裝置同步中...";
+        btn.disabled = true;
+
+        const db = await loadDB();
 
         if (db[subAcc]) {
+            btn.innerText = "產生金鑰並同步至雲端";
+            btn.disabled = false;
             return alert('該帳號已存在！');
         }
 
@@ -327,9 +375,12 @@
             isUsed: false
         };
 
-        saveDB(db);
+        await saveDB(db);
 
-        alert(`✅ 授權成功！\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
+        btn.innerText = "產生金鑰並同步至雲端";
+        btn.disabled = false;
+
+        alert(`✅ 授權成功！所有手機均可立刻登入\n\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
 
         document.getElementById('subAccInput').value = '';
         document.getElementById('subPwdInput').value = '';
@@ -337,13 +388,14 @@
         updateKeyList();
     }
 
-    function updateKeyList() {
+    async function updateKeyList() {
         const list = document.getElementById('keyList');
+        list.innerHTML = '<li class="list-group-item text-muted text-center">連線雲端資料庫中...</li>';
+        const db = await loadDB();
         list.innerHTML = '';
-        const db = loadDB();
         const accounts = Object.keys(db);
         if (accounts.length === 0) {
-            list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何紀錄</li>';
+            list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何雲端紀錄</li>';
             return;
         }
         for (let acc of accounts) {
@@ -358,9 +410,9 @@
         }
     }
 
-    function clearAllData() {
-        if (confirm('確定要清空所有資料庫紀錄？')) {
-            localStorage.removeItem('scratch_db');
+    async function clearAllData() {
+        if (confirm('確定要清空雲端資料庫中的所有紀錄？')) {
+            await saveDB({});
             updateKeyList();
         }
     }
