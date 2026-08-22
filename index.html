@@ -215,6 +215,7 @@
 <script>
     const DEFAULT_BG = "https://i.postimg.cc/85fGp1Rd/sai-tebg.png";
     const JSONBIN_API_KEY = "$2a$10$92XGHP.lNCPqYGVXwVe1OO1/L4jOoI01kKN4TNQwrALhIOuj8tWwy"; 
+    const JSONBIN_BIN_ID = "6a89842df5f4af5e2934e74f";
 
     const ADMIN_USER = "cvv005";
     const ADMIN_PASS = "cvv111213";
@@ -223,79 +224,34 @@
         document.getElementById('bgLayer').style.backgroundImage = `url('${DEFAULT_BG}')`;
     });
 
-    // 取得雲端 Bin ID
-    async function getBinID() {
-        let binId = localStorage.getItem('scratch_bin_id');
-        if (binId) return binId;
-
-        try {
-            const res = await fetch('https://api.jsonbin.io/v3/b', {
-                method: 'GET',
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
-            });
-            const data = await res.json();
-            if (Array.isArray(data) && data.length > 0) {
-                binId = data[0].record;
-                localStorage.setItem('scratch_bin_id', binId);
-                return binId;
-            }
-        } catch (e) {
-            console.error("讀取 Bin ID 失敗", e);
-        }
-        return null;
-    }
-
     // 讀取雲端資料庫
     async function loadDB() {
-        let binId = await getBinID();
-        if (!binId) {
-            const saved = localStorage.getItem('scratch_db');
-            return saved ? JSON.parse(saved) : {};
-        }
-
         try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                headers: { 
+                    'X-Master-Key': JSONBIN_API_KEY,
+                    'X-Bin-Meta': 'false'
+                }
             });
             const data = await res.json();
-            return data.record || {};
+            return (data && typeof data === 'object') ? data : {};
         } catch (e) {
-            console.error("雲端載入失敗，切換至備份:", e);
-            const saved = localStorage.getItem('scratch_db');
-            return saved ? JSON.parse(saved) : {};
+            console.error("雲端載入失敗:", e);
+            return {};
         }
     }
 
     // 寫入雲端資料庫
     async function saveDB(db) {
-        localStorage.setItem('scratch_db', JSON.stringify(db));
-
         try {
-            let binId = await getBinID();
-            if (!binId) {
-                const res = await fetch('https://api.jsonbin.io/v3/b', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_API_KEY,
-                        'X-Bin-Private': 'true'
-                    },
-                    body: JSON.stringify(db)
-                });
-                const data = await res.json();
-                if (data.metadata && data.metadata.id) {
-                    localStorage.setItem('scratch_bin_id', data.metadata.id);
-                }
-            } else {
-                await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_API_KEY
-                    },
-                    body: JSON.stringify(db)
-                });
-            }
+            await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_API_KEY
+                },
+                body: JSON.stringify(db)
+            });
         } catch (e) {
             console.error("雲端同步失敗:", e);
         }
@@ -380,7 +336,7 @@
         btn.innerText = "產生金鑰並同步至雲端";
         btn.disabled = false;
 
-        alert(`✅ 授權成功！所有手機均可立刻登入\n\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
+        alert(`✅ 授權成功！所有手機與裝置均可立刻登入\n\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
 
         document.getElementById('subAccInput').value = '';
         document.getElementById('subPwdInput').value = '';
@@ -393,7 +349,7 @@
         list.innerHTML = '<li class="list-group-item text-muted text-center">連線雲端資料庫中...</li>';
         const db = await loadDB();
         list.innerHTML = '';
-        const accounts = Object.keys(db);
+        const accounts = Object.keys(db).filter(k => k !== 'test');
         if (accounts.length === 0) {
             list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何雲端紀錄</li>';
             return;
