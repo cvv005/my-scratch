@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>埃及神祇・命運刮刮樂</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --egypt-gold: #ffd700;
+            --egypt-purple: #9b51e0;
+            --egypt-blue: #00d2ff;
+        }
+
+        * { font-family: 'Noto Sans TC', sans-serif; }
+
+        body { 
+            background: #0b0712;
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0; 
+            color: #ffffff;
+            position: relative;
+        }
+
+        /* 超強效隱藏 Netlify 浮水印 */
+        [class*="netlify"], 
+        iframe[src*="netlify"], 
+        .netlify-badge,
+        #netlify-badge,
+        [data-netlify-deploy-id],
+        netlify-plugin-drawer,
+        div[style*="fixed"][style*="bottom"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            z-index: -9999 !important;
+        }
+
+        /* 埃及背景圖層 */
+        .bg-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            transition: background-image 0.5s ease;
+        }
+
+        /* 暗色遮罩 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: -1;
+        }
+
+        /* 奢華玻璃卡片 */
+        .egypt-card { 
+            width: 90%; 
+            max-width: 460px; 
+            padding: 35px 25px; 
+            border-radius: 20px; 
+            background: rgba(12, 8, 20, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2px solid var(--egypt-gold);
+            box-shadow: 
+                0 0 25px rgba(255, 215, 0, 0.4),
+                inset 0 0 15px rgba(155, 81, 224, 0.3);
+            text-align: center; 
+            position: relative;
+            z-index: 1;
+        }
+
+        .egypt-title {
+            color: var(--egypt-gold);
+            font-size: 26px;
+            font-weight: 900;
+            text-shadow: 0 0 12px var(--egypt-gold), 0 0 20px var(--egypt-purple);
+            letter-spacing: 2px;
+        }
+
+        .egypt-input {
+            background: rgba(10, 5, 20, 0.85) !important;
+            border: 1px solid var(--egypt-gold) !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            box-shadow: inset 0 0 8px rgba(255, 215, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .egypt-input::placeholder {
+            color: rgba(255, 215, 0, 0.6) !important;
+            font-size: 14px;
+        }
+
+        .egypt-input:focus {
+            border-color: var(--egypt-blue) !important;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.6) !important;
+        }
+
+        .btn-egypt {
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            border: none;
+            color: #1a0033;
+            font-weight: 900;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .btn-egypt:hover {
+            background: linear-gradient(135deg, #ffffff, #ffd700);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+            transform: translateY(-2px);
+            color: #000;
+        }
+
+        .scratch-container { 
+            position: relative; 
+            width: 300px; 
+            height: 150px; 
+            margin: 20px auto; 
+            display: none; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 2px solid var(--egypt-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .prize-layer { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            background: radial-gradient(circle, #2a085c 0%, #0d001a 100%); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 900; 
+            color: var(--egypt-gold); 
+            text-shadow: 0 0 10px var(--egypt-gold);
+        }
+
+        canvas { 
+            position: absolute; 
+            top: 0; left: 0; 
+            cursor: crosshair; 
+            transition: opacity 0.5s ease; 
+        }
+
+        .list-group-item {
+            background: rgba(15, 5, 25, 0.8) !important;
+            border-color: rgba(255, 215, 0, 0.2) !important;
+            color: #ffffff !important;
+            font-size: 13px;
+        }
+
+        .badge-used { color: #ff4d4d; font-weight: bold; }
+        .badge-active { color: #00ff88; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="bgLayer" class="bg-layer"></div>
+
+<div class="egypt-card">
+    
+    <!-- 1. 驗證頁面 -->
+    <div id="loginPage">
+        <h3 class="egypt-title mb-3">𓋹 埃及神祇・刮刮樂 𓋹</h3>
+        
+        <div id="loginForm">
+            <p class="text-warning small mb-3">請輸入您的驗證資料以開啟獎項：</p>
+            
+            <input type="text" id="accInput" class="form-control egypt-input mb-2 text-center" placeholder="輸入用戶帳號">
+            <input type="password" id="pwdInput" class="form-control egypt-input mb-2 text-center" placeholder="輸入用戶密碼">
+            <input type="text" id="keyInput" class="form-control egypt-input mb-3 text-center fw-bold" placeholder="KEY-XXXXXX" style="letter-spacing: 2px;">
+            
+            <button class="btn btn-egypt w-100 py-2.5 rounded-pill" onclick="handleLogin()">開啟神聖契約</button>
+        </div>
+
+        <!-- 刮刮樂區域 -->
+        <div id="scratchSection">
+            <div class="scratch-container" id="scratchContainer">
+                <div class="prize-layer">
+                    <div style="color: var(--egypt-blue); font-size: 13px; letter-spacing: 2px;">❖ 恭喜獲得獎項 ❖</div>
+                    <div id="prizeResult" style="font-size: 26px; margin-top: 5px;"></div>
+                </div>
+                <canvas id="scratchCanvas" width="300" height="150"></canvas>
+            </div>
+            <p id="scratchHint" class="text-warning small mt-2 fw-bold" style="display: none;">✨ 請滑動塗抹刮開塗層 ✨</p>
+        </div>
+    </div>
+
+    <!-- 2. 管理員控制台 -->
+    <div id="adminPage" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="egypt-title mb-0" style="font-size: 18px;">⚙️ 控制台主機</h4>
+            <button class="btn btn-outline-warning btn-sm rounded-pill" onclick="logoutAdmin()">登出</button>
+        </div>
+
+        <!-- 授權資料設定區 -->
+        <div class="card p-3 mb-3 text-start border-0" style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--egypt-gold) !important;">
+            <h6 class="text-warning fw-bold mb-2">🔑 新增授權資料：</h6>
+            <input type="text" id="subAccInput" class="form-control egypt-input mb-2" placeholder="設定子帳號">
+            <input type="text" id="subPwdInput" class="form-control egypt-input mb-2" placeholder="設定子密碼">
+            <input type="text" id="prizeInput" class="form-control egypt-input mb-3" placeholder="設定金額 (如：$500)">
+            
+            <button class="btn btn-egypt w-100 fw-bold rounded-3" onclick="generateSubAccount()">產生金鑰與開通</button>
+        </div>
+
+        <div class="text-start">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="text-warning fw-bold mb-0">資料庫紀錄：</h6>
+                <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" onclick="clearAllData()">清空所有紀錄</button>
+            </div>
+            <div style="max-height: 150px; overflow-y: auto;">
+                <ul id="keyList" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+
+        <button class="btn btn-outline-light w-100 mt-3 rounded-pill" onclick="logoutAdmin()">返回首頁</button>
+    </div>
+
+</div>
+
+<script>
+    // 指定背景圖片直接連結
+    const DEFAULT_BG = "https://i.postimg.cc/85fGp1Rd/sai-tebg.png";
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('bgLayer').style.backgroundImage = `url('${DEFAULT_BG}')`;
+        
+        // JS 自動強行清除 Netlify 浮水印腳本與 DOM 節點
+        const removeNetlifyBadge = () => {
+            const badges = document.querySelectorAll('[class*="netlify"], iframe[src*="netlify"], netlify-plugin-drawer, #netlify-badge');
+            badges.forEach(el => el.remove());
+        };
+        removeNetlifyBadge();
+        setInterval(removeNetlifyBadge, 500);
+    });
+
+    const ADMIN_USER = "cvv005";
+    const ADMIN_PASS = "cvv111213";
+
+    function loadDB() {
+        const savedData = localStorage.getItem('scratch_db');
+        return savedData ? JSON.parse(savedData) : {};
+    }
+
+    function saveDB(db) {
+        localStorage.setItem('scratch_db', JSON.stringify(db));
+    }
+
+    function handleLogin() {
+        const acc = document.getElementById('accInput').value.trim();
+        const pwd = document.getElementById('pwdInput').value.trim();
+        const key = document.getElementById('keyInput').value.trim().toUpperCase();
+
+        if (!acc || !pwd) {
+            return alert('請輸入帳號與密碼！');
+        }
+
+        if (acc === ADMIN_USER && pwd === ADMIN_PASS) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'block';
+            clearLoginForm();
+            updateKeyList();
+            return;
+        }
+
+        if (!key) {
+            return alert('請輸入金鑰！');
+        }
+
+        const db = loadDB();
+        const user = db[acc];
+        
+        if (!user || user.password !== pwd || user.key !== key) {
+            return alert('❌ 驗證失敗！帳號、密碼或金鑰錯誤。');
+        }
+
+        if (user.isUsed) {
+            return alert('⚠️ 該金鑰已經使用過！');
+        }
+
+        user.isUsed = true;
+        saveDB(db);
+
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('scratchContainer').style.display = 'block';
+        document.getElementById('scratchHint').style.display = 'block';
+        document.getElementById('prizeResult').innerText = user.prize;
+        
+        initCanvas();
+    }
+
+    function generateSubAccount() {
+        const subAcc = document.getElementById('subAccInput').value.trim();
+        const subPwd = document.getElementById('subPwdInput').value.trim();
+        const prize = document.getElementById('prizeInput').value.trim();
+
+        if (!subAcc || !subPwd || !prize) {
+            return alert('請填寫完整資訊！');
+        }
+
+        const db = loadDB();
+
+        if (db[subAcc]) {
+            return alert('該帳號已存在！');
+        }
+
+        const generatedKey = 'KEY-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        db[subAcc] = {
+            password: subPwd,
+            key: generatedKey,
+            prize: prize,
+            isUsed: false
+        };
+
+        saveDB(db);
+
+        alert(`✅ 授權成功！\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
+
+        document.getElementById('subAccInput').value = '';
+        document.getElementById('subPwdInput').value = '';
+        document.getElementById('prizeInput').value = '';
+        updateKeyList();
+    }
+
+    function updateKeyList() {
+        const list = document.getElementById('keyList');
+        list.innerHTML = '';
+        const db = loadDB();
+        const accounts = Object.keys(db);
+        if (accounts.length === 0) {
+            list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何紀錄</li>';
+            return;
+        }
+        for (let acc of accounts) {
+            const item = db[acc];
+            const status = item.isUsed 
+                ? '<span class="badge-used">[已刮開]</span>' 
+                : '<span class="badge-active">[可使用]</span>';
+            list.innerHTML += `<li class="list-group-item">
+                <b>帳號:</b> ${acc} | <b>密碼:</b> ${item.password}<br>
+                <b>金鑰:</b> ${item.key} (${item.prize}) ${status}
+            </li>`;
+        }
+    }
+
+    function clearAllData() {
+        if (confirm('確定要清空所有資料庫紀錄？')) {
+            localStorage.removeItem('scratch_db');
+            updateKeyList();
+        }
+    }
+
+    function logoutAdmin() {
+        document.getElementById('adminPage').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'block';
+        clearLoginForm();
+    }
+
+    function clearLoginForm() {
+        document.getElementById('accInput').value = '';
+        document.getElementById('pwdInput').value = '';
+        document.getElementById('keyInput').value = '';
+    }
+
+    let ctx, isDrawing = false, count = 0;
+    function initCanvas() {
+        const canvas = document.getElementById('scratchCanvas');
+        ctx = canvas.getContext('2d');
+        ctx.globalCompositeOperation = 'source-over';
+        
+        const grad = ctx.createLinearGradient(0, 0, 300, 150);
+        grad.addColorStop(0, '#b8860b');
+        grad.addColorStop(0.5, '#4a0e4e');
+        grad.addColorStop(1, '#ffd700');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 300, 150);
+        
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(5, 5, 290, 140);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 16px "Noto Sans TC"';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#ffd700';
+        ctx.shadowBlur = 8;
+        ctx.fillText('✨ 滑動刮開金屬圖層 ✨', 150, 80);
+
+        canvas.onmousedown = canvas.ontouchstart = () => { isDrawing = true; };
+        canvas.onmouseup = canvas.ontouchend = () => { isDrawing = false; };
+        canvas.onmousemove = canvas.ontouchmove = (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            count++;
+            if (count > 30) canvas.style.opacity = '0';
+        };
+    }
+</script>
+</body>
+</html>
