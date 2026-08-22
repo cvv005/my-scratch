@@ -214,8 +214,7 @@
 
 <script>
     const DEFAULT_BG = "https://i.postimg.cc/85fGp1Rd/sai-tebg.png";
-    const JSONBIN_API_KEY = "$2a$10$92XGHP.lNCPqYGVXwVe1OO1/L4jOoI01kKN4TNQwrALhIOuj8tWwy"; 
-    const JSONBIN_BIN_ID = "6a89842df5f4af5e2934e74f";
+    const FIREBASE_URL = "https://egypt-scratch-default-rtdb.firebaseio.com/users";
 
     const ADMIN_USER = "cvv005";
     const ADMIN_PASS = "cvv111213";
@@ -224,36 +223,30 @@
         document.getElementById('bgLayer').style.backgroundImage = `url('${DEFAULT_BG}')`;
     });
 
-    // 讀取雲端資料庫
+    // 讀取全雲端資料庫
     async function loadDB() {
         try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                headers: { 
-                    'X-Master-Key': JSONBIN_API_KEY,
-                    'X-Bin-Meta': 'false'
-                }
-            });
+            const res = await fetch(`${FIREBASE_URL}.json`);
             const data = await res.json();
-            return (data && typeof data === 'object') ? data : {};
+            return data || {};
         } catch (e) {
-            console.error("雲端載入失敗:", e);
+            console.error("雲端讀取失敗", e);
             return {};
         }
     }
 
-    // 寫入雲端資料庫
-    async function saveDB(db) {
+    // 寫入全雲端資料庫
+    async function saveUser(acc, userData) {
         try {
-            await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+            await fetch(`${FIREBASE_URL}/${acc}.json`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_API_KEY
-                },
-                body: JSON.stringify(db)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
             });
+            return true;
         } catch (e) {
-            console.error("雲端同步失敗:", e);
+            console.error("雲端寫入失敗", e);
+            return false;
         }
     }
 
@@ -293,7 +286,7 @@
         }
 
         user.isUsed = true;
-        await saveDB(db);
+        await saveUser(acc, user);
 
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('scratchContainer').style.display = 'block';
@@ -324,19 +317,19 @@
 
         const generatedKey = 'KEY-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-        db[subAcc] = {
+        const newUser = {
             password: subPwd,
             key: generatedKey,
             prize: prize,
             isUsed: false
         };
 
-        await saveDB(db);
+        await saveUser(subAcc, newUser);
 
         btn.innerText = "產生金鑰並同步至雲端";
         btn.disabled = false;
 
-        alert(`✅ 授權成功！所有手機與裝置均可立刻登入\n\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
+        alert(`✅ 授權成功！所有手機均可立刻登入\n\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
 
         document.getElementById('subAccInput').value = '';
         document.getElementById('subPwdInput').value = '';
@@ -349,7 +342,7 @@
         list.innerHTML = '<li class="list-group-item text-muted text-center">連線雲端資料庫中...</li>';
         const db = await loadDB();
         list.innerHTML = '';
-        const accounts = Object.keys(db).filter(k => k !== 'test');
+        const accounts = Object.keys(db);
         if (accounts.length === 0) {
             list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何雲端紀錄</li>';
             return;
@@ -368,7 +361,7 @@
 
     async function clearAllData() {
         if (confirm('確定要清空雲端資料庫中的所有紀錄？')) {
-            await saveDB({});
+            await fetch(`${FIREBASE_URL}.json`, { method: 'DELETE' });
             updateKeyList();
         }
     }
