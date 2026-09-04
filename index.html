@@ -160,11 +160,10 @@
         <h3 class="egypt-title mb-3">𓋹 埃及神祇・刮刮樂 𓋹</h3>
         
         <div id="loginForm">
-            <p class="text-warning small mb-3">請輸入您的驗證資料以開啟獎項：</p>
+            <p class="text-warning small mb-3">請輸入您的驗證密碼與金鑰以開啟獎項：</p>
             
-            <input type="text" id="accInput" class="form-control egypt-input mb-2 text-center" placeholder="輸入用戶帳號">
-            <input type="password" id="pwdInput" class="form-control egypt-input mb-2 text-center" placeholder="輸入用戶密碼">
-            <input type="text" id="keyInput" class="form-control egypt-input mb-3 text-center fw-bold" placeholder="KEY-XXXXXX" style="letter-spacing: 2px;">
+            <input type="password" id="pwdInput" class="form-control egypt-input mb-2 text-center" placeholder="輸入驗證密碼">
+            <input type="text" id="keyInput" class="form-control egypt-input mb-3 text-center fw-bold" placeholder="KEY-XXXXXX 或 金鑰" style="letter-spacing: 2px;">
             
             <button class="btn btn-egypt w-100 py-2.5 rounded-pill" id="loginBtn" onclick="handleLogin()">開啟神聖契約</button>
         </div>
@@ -190,8 +189,7 @@
 
         <div class="card p-3 mb-3 text-start border-0" style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--egypt-gold) !important;">
             <h6 class="text-warning fw-bold mb-2">🔑 新增雲端授權資料：</h6>
-            <input type="text" id="subAccInput" class="form-control egypt-input mb-2" placeholder="設定子帳號">
-            <input type="text" id="subPwdInput" class="form-control egypt-input mb-2" placeholder="設定子密碼">
+            <input type="text" id="subPwdInput" class="form-control egypt-input mb-2" placeholder="設定使用者密碼">
             <input type="text" id="prizeInput" class="form-control egypt-input mb-3" placeholder="設定金額 (如：$500)">
             
             <button class="btn btn-egypt w-100 fw-bold rounded-3" id="genBtn" onclick="generateSubAccount()">產生金鑰並同步至雲端</button>
@@ -202,7 +200,7 @@
                 <h6 class="text-warning fw-bold mb-0">雲端同步紀錄：</h6>
                 <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" onclick="clearAllData()">清空雲端紀錄</button>
             </div>
-            <div style="max-height: 150px; overflow-y: auto;">
+            <div style="max-height: 180px; overflow-y: auto;">
                 <ul id="keyList" class="list-group list-group-flush"></ul>
             </div>
         </div>
@@ -217,8 +215,9 @@
     const JSONBIN_API_KEY = "$2a$10$92XGHP.lNCPqYGVXwVe1OO1/L4jOoI01kKN4TNQwrALhIOuj8tWwy";
     const JSONBIN_BIN_ID = "6a89842df5f4af5e2934e74f";
 
-    const ADMIN_USER = "cvv005";
+    // 管理員登入認證資訊 (免帳號，密碼 + 金鑰)
     const ADMIN_PASS = "cvv111213";
+    const ADMIN_KEY  = "cvv005";
 
     window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('bgLayer').style.backgroundImage = `url('${DEFAULT_BG}')`;
@@ -268,14 +267,13 @@
     }
 
     async function handleLogin() {
-        const acc = document.getElementById('accInput').value.trim();
         const pwd = document.getElementById('pwdInput').value.trim();
-        const key = document.getElementById('keyInput').value.trim().toUpperCase();
+        const key = document.getElementById('keyInput').value.trim();
 
-        if (!acc || !pwd) return alert('請輸入帳號與密碼！');
+        if (!pwd || !key) return alert('請輸入密碼與金鑰！');
 
-        if (acc === ADMIN_USER && pwd === ADMIN_PASS) {
-            // 儲存管理員登入狀態
+        // 管理員驗證 (密碼 cvv111213 + 金鑰 cvv005)
+        if (pwd === ADMIN_PASS && key === ADMIN_KEY) {
             localStorage.setItem('isAdminLoggedIn', 'true');
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('adminPage').style.display = 'block';
@@ -284,21 +282,30 @@
             return;
         }
 
-        if (!key) return alert('請輸入金鑰！');
-
         const btn = document.getElementById('loginBtn');
         btn.innerText = "連線雲端驗證中...";
         btn.disabled = true;
 
         const db = await loadDB();
-        const user = db[acc];
+        
+        // 在資料庫中尋找符合密碼與金鑰的紀錄
+        let foundKey = null;
+        for (let itemKey in db) {
+            const item = db[itemKey];
+            if (item && item.password === pwd && item.key.toUpperCase() === key.toUpperCase()) {
+                foundKey = itemKey;
+                break;
+            }
+        }
 
         btn.innerText = "開啟神聖契約";
         btn.disabled = false;
         
-        if (!user || user.password !== pwd || user.key !== key) {
-            return alert('❌ 驗證失敗！帳號、密碼或金鑰錯誤。');
+        if (!foundKey) {
+            return alert('❌ 驗證失敗！密碼或金鑰錯誤。');
         }
+
+        const user = db[foundKey];
 
         if (user.isUsed) {
             return alert('⚠️ 該金鑰已經使用過！');
@@ -316,11 +323,10 @@
     }
 
     async function generateSubAccount() {
-        const subAcc = document.getElementById('subAccInput').value.trim();
         const subPwd = document.getElementById('subPwdInput').value.trim();
         const prize = document.getElementById('prizeInput').value.trim();
 
-        if (!subAcc || !subPwd || !prize) return alert('請填寫完整資訊！');
+        if (!subPwd || !prize) return alert('請填寫完整資訊！');
 
         const btn = document.getElementById('genBtn');
         btn.innerText = "跨裝置同步中...";
@@ -328,15 +334,10 @@
 
         const db = await loadDB();
 
-        if (db[subAcc]) {
-            btn.innerText = "產生金鑰並同步至雲端";
-            btn.disabled = false;
-            return alert('該帳號已存在！');
-        }
-
         const generatedKey = 'KEY-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const dataId = 'ID_' + Date.now();
 
-        db[subAcc] = {
+        db[dataId] = {
             password: subPwd,
             key: generatedKey,
             prize: prize,
@@ -348,9 +349,8 @@
         btn.innerText = "產生金鑰並同步至雲端";
         btn.disabled = false;
 
-        alert(`✅ 授權成功！所有手機均可立刻登入\n\n帳號：${subAcc}\n密碼：${subPwd}\n金鑰：${generatedKey}`);
+        alert(`✅ 授權成功！\n\n密碼：${subPwd}\n金鑰：${generatedKey}\n金額：${prize}`);
 
-        document.getElementById('subAccInput').value = '';
         document.getElementById('subPwdInput').value = '';
         document.getElementById('prizeInput').value = '';
         updateKeyList();
@@ -363,22 +363,34 @@
         const db = await loadDB();
         list.innerHTML = '';
         
-        const accounts = Object.keys(db).filter(k => k !== 'test' && db[k] && db[k].password);
+        const keys = Object.keys(db).filter(k => k !== 'test' && db[k] && db[k].password);
         
-        if (accounts.length === 0) {
+        if (keys.length === 0) {
             list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何雲端紀錄</li>';
             return;
         }
 
-        for (let acc of accounts) {
-            const item = db[acc];
+        for (let k of keys) {
+            const item = db[k];
             const status = item.isUsed 
                 ? '<span class="badge-used">[已刮開]</span>' 
                 : '<span class="badge-active">[可使用]</span>';
-            list.innerHTML += `<li class="list-group-item">
-                <b>帳號:</b> ${acc} | <b>密碼:</b> ${item.password}<br>
-                <b>金鑰:</b> ${item.key} (${item.prize}) ${status}
+            list.innerHTML += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <b>密碼:</b> ${item.password}<br>
+                    <b>金鑰:</b> ${item.key} (${item.prize}) ${status}
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteItem('${k}')">刪除</button>
             </li>`;
+        }
+    }
+
+    async function deleteItem(id) {
+        if (confirm('確定要刪除這筆授權紀錄？')) {
+            const db = await loadDB();
+            delete db[id];
+            await saveDB(db);
+            updateKeyList();
         }
     }
 
@@ -390,7 +402,6 @@
     }
 
     function logoutAdmin() {
-        // 清除管理員登入狀態紀錄
         localStorage.removeItem('isAdminLoggedIn');
         document.getElementById('adminPage').style.display = 'none';
         document.getElementById('loginPage').style.display = 'block';
@@ -398,7 +409,6 @@
     }
 
     function clearLoginForm() {
-        document.getElementById('accInput').value = '';
         document.getElementById('pwdInput').value = '';
         document.getElementById('keyInput').value = '';
     }
