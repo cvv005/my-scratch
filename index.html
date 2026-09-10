@@ -196,8 +196,8 @@
 
         <div class="text-start">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="text-warning fw-bold mb-0">雲端 131 組授權紀錄：</h6>
-                <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" onclick="clearAllData()">重置雲端資料庫</button>
+                <h6 class="text-warning fw-bold mb-0">雲端授權紀錄：</h6>
+                <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" onclick="initCloudData()">重置並注入 131 組金鑰至雲端</button>
             </div>
             <div style="max-height: 200px; overflow-y: auto;">
                 <ul id="keyList" class="list-group list-group-flush"></ul>
@@ -214,53 +214,8 @@
     const JSONBIN_API_KEY = "$2a$10$92XGHP.lNCPqYGVXwVe1OO1/L4jOoI01kKN4TNQwrALhIOuj8tWwy";
     const JSONBIN_BIN_ID = "6a89842df5f4af5e2934e74f";
 
-    // 管理員登入金鑰
+    // 管理員登入金鑰 (只有這組管理員金鑰，完全沒有一般玩家的金鑰)
     const ADMIN_KEY = "cvv005";
-
-    // 預置 131 組金鑰與金額範本
-    const DEFAULT_KEYS = {
-        // 🏆 大獎 (1組)
-        "X9K8-J3P7-W2M4-11688": { prize: "$11,688", isUsed: false },
-
-        // 🎁 中獎 (30組)
-        "B01-3891": { prize: "$1,688", isUsed: false }, "B02-8821": { prize: "$2,350", isUsed: false },
-        "B03-1492": { prize: "$3,120", isUsed: false }, "B04-6201": { prize: "$1,520", isUsed: false },
-        "B05-9034": { prize: "$2,888", isUsed: false }, "B06-5129": { prize: "$1,980", isUsed: false },
-        "B07-7310": { prize: "$3,500", isUsed: false }, "B08-2849": { prize: "$1,780", isUsed: false },
-        "B09-4012": { prize: "$2,460", isUsed: false }, "B10-8593": { prize: "$3,780", isUsed: false },
-        "B11-1284": { prize: "$1,388", isUsed: false }, "B12-6739": { prize: "$2,950", isUsed: false },
-        "B13-3401": { prize: "$3,320", isUsed: false }, "B14-9582": { prize: "$1,850", isUsed: false },
-        "B15-5103": { prize: "$3,680", isUsed: false }, "B16-2049": { prize: "$2,580", isUsed: false },
-        "B17-7712": { prize: "$1,888", isUsed: false }, "B18-3058": { prize: "$3,660", isUsed: false },
-        "B19-9182": { prize: "$2,180", isUsed: false }, "B20-4431": { prize: "$1,450", isUsed: false },
-        "B21-8201": { prize: "$3,280", isUsed: false }, "B22-1928": { prize: "$2,750", isUsed: false },
-        "B23-6630": { prize: "$1,920", isUsed: false }, "B24-3102": { prize: "$3,850", isUsed: false },
-        "B25-5829": { prize: "$2,200", isUsed: false }, "B26-9041": { prize: "$1,650", isUsed: false },
-        "B27-2384": { prize: "$3,400", isUsed: false }, "B28-7193": { prize: "$2,800", isUsed: false },
-        "B29-4028": { prize: "$1,580", isUsed: false }, "B30-8319": { prize: "$3,180", isUsed: false },
-
-        // 🎈 小獎 (100組 - A001~A100)
-        "A001-120": { prize: "$168", isUsed: false }, "A002-841": { prize: "$250", isUsed: false }, "A003-392": { prize: "$588", isUsed: false }, "A004-710": { prize: "$138", isUsed: false }, "A005-529": { prize: "$888", isUsed: false },
-        "A006-204": { prize: "$320", isUsed: false }, "A007-918": { prize: "$680", isUsed: false }, "A008-431": { prize: "$190", isUsed: false }, "A009-882": { prize: "$750", isUsed: false }, "A010-159": { prize: "$420", isUsed: false },
-        "A011-620": { prize: "$810", isUsed: false }, "A012-384": { prize: "$280", isUsed: false }, "A013-902": { prize: "$500", isUsed: false }, "A014-471": { prize: "$160", isUsed: false }, "A015-812": { prize: "$630", isUsed: false },
-        "A016-293": { prize: "$350", isUsed: false }, "A017-740": { prize: "$790", isUsed: false }, "A018-105": { prize: "$210", isUsed: false }, "A019-582": { prize: "$480", isUsed: false }, "A020-921": { prize: "$860", isUsed: false },
-        "A021-364": { prize: "$175", isUsed: false }, "A022-819": { prize: "$690", isUsed: false }, "A023-402": { prize: "$310", isUsed: false }, "A024-751": { prize: "$540", isUsed: false }, "A025-183": { prize: "$270", isUsed: false },
-        "A026-382": { prize: "$450", isUsed: false }, "A027-910": { prize: "$780", isUsed: false }, "A028-402": { prize: "$138", isUsed: false }, "A029-829": { prize: "$620", isUsed: false }, "A030-153": { prize: "$330", isUsed: false },
-        "A031-671": { prize: "$850", isUsed: false }, "A032-249": { prize: "$290", isUsed: false }, "A033-801": { prize: "$168", isUsed: false }, "A034-394": { prize: "$520", isUsed: false }, "A035-712": { prize: "$710", isUsed: false },
-        "A036-503": { prize: "$230", isUsed: false }, "A037-182": { prize: "$660", isUsed: false }, "A038-930": { prize: "$410", isUsed: false }, "A039-274": { prize: "$888", isUsed: false }, "A040-619": { prize: "$180", isUsed: false },
-        "A041-840": { prize: "$360", isUsed: false }, "A042-318": { prize: "$590", isUsed: false }, "A043-792": { prize: "$220", isUsed: false }, "A044-105": { prize: "$800", isUsed: false }, "A045-643": { prize: "$340", isUsed: false },
-        "A046-281": { prize: "$670", isUsed: false }, "A047-902": { prize: "$150", isUsed: false }, "A048-439": { prize: "$480", isUsed: false }, "A049-810": { prize: "$730", isUsed: false }, "A050-327": { prize: "$290", isUsed: false },
-        "A051-782": { prize: "$210", isUsed: false }, "A052-193": { prize: "$680", isUsed: false }, "A053-640": { prize: "$350", isUsed: false }, "A054-821": { prize: "$888", isUsed: false }, "A055-304": { prize: "$160", isUsed: false },
-        "A056-918": { prize: "$490", isUsed: false }, "A057-529": { prize: "$720", isUsed: false }, "A058-102": { prize: "$250", isUsed: false }, "A059-743": { prize: "$580", isUsed: false }, "A060-381": { prize: "$830", isUsed: false },
-        "A061-920": { prize: "$138", isUsed: false }, "A062-418": { prize: "$390", isUsed: false }, "A063-851": { prize: "$760", isUsed: false }, "A064-209": { prize: "$280", isUsed: false }, "A065-630": { prize: "$510", isUsed: false },
-        "A066-172": { prize: "$888", isUsed: false }, "A067-941": { prize: "$190", isUsed: false }, "A068-308": { prize: "$430", isUsed: false }, "A069-821": { prize: "$670", isUsed: false }, "A070-492": { prize: "$240", isUsed: false },
-        "A071-150": { prize: "$810", isUsed: false }, "A072-739": { prize: "$370", isUsed: false }, "A073-201": { prize: "$590", isUsed: false }, "A074-682": { prize: "$168", isUsed: false }, "A075-904": { prize: "$440", isUsed: false },
-        "A076-291": { prize: "$520", isUsed: false }, "A077-802": { prize: "$188", isUsed: false }, "A078-431": { prize: "$750", isUsed: false }, "A079-918": { prize: "$320", isUsed: false }, "A080-103": { prize: "$660", isUsed: false },
-        "A081-659": { prize: "$280", isUsed: false }, "A082-240": { prize: "$810", isUsed: false }, "A083-891": { prize: "$150", isUsed: false }, "A084-312": { prize: "$420", isUsed: false }, "A085-709": { prize: "$690", isUsed: false },
-        "A086-182": { prize: "$230", isUsed: false }, "A087-540": { prize: "$888", isUsed: false }, "A088-921": { prize: "$360", isUsed: false }, "A089-304": { prize: "$198", isUsed: false }, "A090-819": { prize: "$580", isUsed: false },
-        "A091-271": { prize: "$720", isUsed: false }, "A092-630": { prize: "$138", isUsed: false }, "A093-104": { prize: "$450", isUsed: false }, "A094-859": { prize: "$830", isUsed: false }, "A095-320": { prize: "$260", isUsed: false },
-        "A096-741": { prize: "$610", isUsed: false }, "A097-192": { prize: "$380", isUsed: false }, "A098-803": { prize: "$790", isUsed: false }, "A099-420": { prize: "$168", isUsed: false }, "A100-981": { prize: "$888", isUsed: false }
-    };
 
     window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('bgLayer').style.backgroundImage = `url('${DEFAULT_BG}')`;
@@ -272,7 +227,7 @@
         }
     });
 
-    // 讀取 JSONBin 資料庫 (若空則自動注入 131 組預設金鑰)
+    // 讀取雲端資料庫
     async function loadDB() {
         try {
             const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
@@ -283,18 +238,14 @@
                 }
             });
             const data = await res.json();
-            if (!data || Object.keys(data).length === 0) {
-                await saveDB(DEFAULT_KEYS);
-                return DEFAULT_KEYS;
-            }
-            return data;
+            return (data && typeof data === 'object') ? data : {};
         } catch (e) {
             console.error("雲端載入失敗:", e);
-            return DEFAULT_KEYS;
+            return {};
         }
     }
 
-    // 寫入 JSONBin 資料庫
+    // 寫入雲端資料庫
     async function saveDB(db) {
         try {
             await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
@@ -317,7 +268,7 @@
 
         if (!inputKey) return alert('請輸入金鑰！');
 
-        // 管理員驗證 (金鑰：cvv005)
+        // 管理員驗證
         if (inputKey === ADMIN_KEY) {
             localStorage.setItem('isAdminLoggedIn', 'true');
             document.getElementById('loginPage').style.display = 'none';
@@ -333,7 +284,6 @@
 
         const db = await loadDB();
         
-        // 不區分大小寫比對金鑰
         let matchedKey = Object.keys(db).find(k => k.toLowerCase() === inputKey.toLowerCase());
 
         btn.innerText = "開啟神聖契約";
@@ -399,7 +349,7 @@
         const keys = Object.keys(db);
         
         if (keys.length === 0) {
-            list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何雲端紀錄</li>';
+            list.innerHTML = '<li class="list-group-item text-muted text-center">目前無任何雲端紀錄，請點擊上方按鈕重置注入金鑰</li>';
             return;
         }
 
@@ -426,11 +376,52 @@
         }
     }
 
-    async function clearAllData() {
-        if (confirm('確定要將雲端資料庫重置為預設的 131 組金鑰？')) {
-            await saveDB(DEFAULT_KEYS);
-            updateKeyList();
-        }
+    // 由管理員觸發：一次性將 131 組金鑰發送到雲端（不在前端程式碼留下痕跡）
+    async function initCloudData() {
+        if (!confirm('確定要將 131 組初始金鑰直接同步上傳至雲端資料庫？')) return;
+
+        const data131 = {
+            "X9K8-J3P7-W2M4-11688": { prize: "$11,688", isUsed: false },
+            "B01-3891": { prize: "$1,688", isUsed: false }, "B02-8821": { prize: "$2,350", isUsed: false },
+            "B03-1492": { prize: "$3,120", isUsed: false }, "B04-6201": { prize: "$1,520", isUsed: false },
+            "B05-9034": { prize: "$2,888", isUsed: false }, "B06-5129": { prize: "$1,980", isUsed: false },
+            "B07-7310": { prize: "$3,500", isUsed: false }, "B08-2849": { prize: "$1,780", isUsed: false },
+            "B09-4012": { prize: "$2,460", isUsed: false }, "B10-8593": { prize: "$3,780", isUsed: false },
+            "B11-1284": { prize: "$1,388", isUsed: false }, "B12-6739": { prize: "$2,950", isUsed: false },
+            "B13-3401": { prize: "$3,320", isUsed: false }, "B14-9582": { prize: "$1,850", isUsed: false },
+            "B15-5103": { prize: "$3,680", isUsed: false }, "B16-2049": { prize: "$2,580", isUsed: false },
+            "B17-7712": { prize: "$1,888", isUsed: false }, "B18-3058": { prize: "$3,660", isUsed: false },
+            "B19-9182": { prize: "$2,180", isUsed: false }, "B20-4431": { prize: "$1,450", isUsed: false },
+            "B21-8201": { prize: "$3,280", isUsed: false }, "B22-1928": { prize: "$2,750", isUsed: false },
+            "B23-6630": { prize: "$1,920", isUsed: false }, "B24-3102": { prize: "$3,850", isUsed: false },
+            "B25-5829": { prize: "$2,200", isUsed: false }, "B26-9041": { prize: "$1,650", isUsed: false },
+            "B27-2384": { prize: "$3,400", isUsed: false }, "B28-7193": { prize: "$2,800", isUsed: false },
+            "B29-4028": { prize: "$1,580", isUsed: false }, "B30-8319": { prize: "$3,180", isUsed: false },
+            "A001-120": { prize: "$168", isUsed: false }, "A002-841": { prize: "$250", isUsed: false }, "A003-392": { prize: "$588", isUsed: false }, "A004-710": { prize: "$138", isUsed: false }, "A005-529": { prize: "$888", isUsed: false },
+            "A006-204": { prize: "$320", isUsed: false }, "A007-918": { prize: "$680", isUsed: false }, "A008-431": { prize: "$190", isUsed: false }, "A009-882": { prize: "$750", isUsed: false }, "A010-159": { prize: "$420", isUsed: false },
+            "A011-620": { prize: "$810", isUsed: false }, "A012-384": { prize: "$280", isUsed: false }, "A013-902": { prize: "$500", isUsed: false }, "A014-471": { prize: "$160", isUsed: false }, "A015-812": { prize: "$630", isUsed: false },
+            "A016-293": { prize: "$350", isUsed: false }, "A017-740": { prize: "$790", isUsed: false }, "A018-105": { prize: "$210", isUsed: false }, "A019-582": { prize: "$480", isUsed: false }, "A020-921": { prize: "$860", isUsed: false },
+            "A021-364": { prize: "$175", isUsed: false }, "A022-819": { prize: "$690", isUsed: false }, "A023-402": { prize: "$310", isUsed: false }, "A024-751": { prize: "$540", isUsed: false }, "A025-183": { prize: "$270", isUsed: false },
+            "A026-382": { prize: "$450", isUsed: false }, "A027-910": { prize: "$780", isUsed: false }, "A028-402": { prize: "$138", isUsed: false }, "A029-829": { prize: "$620", isUsed: false }, "A030-153": { prize: "$330", isUsed: false },
+            "A031-671": { prize: "$850", isUsed: false }, "A032-249": { prize: "$290", isUsed: false }, "A033-801": { prize: "$168", isUsed: false }, "A034-394": { prize: "$520", isUsed: false }, "A035-712": { prize: "$710", isUsed: false },
+            "A036-503": { prize: "$230", isUsed: false }, "A037-182": { prize: "$660", isUsed: false }, "A038-930": { prize: "$410", isUsed: false }, "A039-274": { prize: "$888", isUsed: false }, "A040-619": { prize: "$180", isUsed: false },
+            "A041-840": { prize: "$360", isUsed: false }, "A042-318": { prize: "$590", isUsed: false }, "A043-792": { prize: "$220", isUsed: false }, "A044-105": { prize: "$800", isUsed: false }, "A045-643": { prize: "$340", isUsed: false },
+            "A046-281": { prize: "$670", isUsed: false }, "A047-902": { prize: "$150", isUsed: false }, "A048-439": { prize: "$480", isUsed: false }, "A049-810": { prize: "$730", isUsed: false }, "A050-327": { prize: "$290", isUsed: false },
+            "A051-782": { prize: "$210", isUsed: false }, "A052-193": { prize: "$680", isUsed: false }, "A053-640": { prize: "$350", isUsed: false }, "A054-821": { prize: "$888", isUsed: false }, "A055-304": { prize: "$160", isUsed: false },
+            "A056-918": { prize: "$490", isUsed: false }, "A057-529": { prize: "$720", isUsed: false }, "A058-102": { prize: "$250", isUsed: false }, "A059-743": { prize: "$580", isUsed: false }, "A060-381": { prize: "$830", isUsed: false },
+            "A061-920": { prize: "$138", isUsed: false }, "A062-418": { prize: "$390", isUsed: false }, "A063-851": { prize: "$760", isUsed: false }, "A064-209": { prize: "$280", isUsed: false }, "A065-630": { prize: "$510", isUsed: false },
+            "A066-172": { prize: "$888", isUsed: false }, "A067-941": { prize: "$190", isUsed: false }, "A068-308": { prize: "$430", isUsed: false }, "A069-821": { prize: "$670", isUsed: false }, "A070-492": { prize: "$240", isUsed: false },
+            "A071-150": { prize: "$810", isUsed: false }, "A072-739": { prize: "$370", isUsed: false }, "A073-201": { prize: "$590", isUsed: false }, "A074-682": { prize: "$168", isUsed: false }, "A075-904": { prize: "$440", isUsed: false },
+            "A076-291": { prize: "$520", isUsed: false }, "A077-802": { prize: "$188", isUsed: false }, "A078-431": { prize: "$750", isUsed: false }, "A079-918": { prize: "$320", isUsed: false }, "A080-103": { prize: "$660", isUsed: false },
+            "A081-659": { prize: "$280", isUsed: false }, "A082-240": { prize: "$810", isUsed: false }, "A083-891": { prize: "$150", isUsed: false }, "A084-312": { prize: "$420", isUsed: false }, "A085-709": { prize: "$690", isUsed: false },
+            "A086-182": { prize: "$230", isUsed: false }, "A087-540": { prize: "$888", isUsed: false }, "A088-921": { prize: "$360", isUsed: false }, "A089-304": { prize: "$198", isUsed: false }, "A090-819": { prize: "$580", isUsed: false },
+            "A091-271": { prize: "$720", isUsed: false }, "A092-630": { prize: "$138", isUsed: false }, "A093-104": { prize: "$450", isUsed: false }, "A094-859": { prize: "$830", isUsed: false }, "A095-320": { prize: "$260", isUsed: false },
+            "A096-741": { prize: "$610", isUsed: false }, "A097-192": { prize: "$380", isUsed: false }, "A098-803": { prize: "$790", isUsed: false }, "A099-420": { prize: "$168", isUsed: false }, "A100-981": { prize: "$888", isUsed: false }
+        };
+
+        await saveDB(data131);
+        alert('✅ 已成功將 131 組金鑰寫入雲端伺服器！');
+        updateKeyList();
     }
 
     function logoutAdmin() {
