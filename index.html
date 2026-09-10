@@ -110,12 +110,12 @@
 
         @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* 核心修改：完美的 9:16 自適應直立卡片，高度不超出螢幕 */
+        /* 9:16 自適應直立卡片 */
         .card-wrapper {
             position: relative;
-            height: 78vh;                  /* 以螢幕高度為基準 */
-            max-height: 600px;
-            aspect-ratio: 9 / 16;          /* 強制維持 9:16 直立長方形比例 */
+            height: 82vh;                  
+            max-height: 640px;
+            aspect-ratio: 9 / 16;          
             border-radius: 28px;
             padding: 2px;
             overflow: hidden;
@@ -151,7 +151,7 @@
             height: 100%;
             background: linear-gradient(155deg, #1f1430 0%, #0d0718 100%);
             border-radius: 26px;
-            padding: 25px 20px 20px;
+            padding: 22px 18px 18px;
             text-align: center;
             z-index: 2;
             display: flex;
@@ -185,15 +185,15 @@
             display: inline-block;
             background: rgba(224, 170, 62, 0.1);
             box-shadow: inset 0 0 10px rgba(224, 170, 62, 0.25);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         /* 徽章 */
         .badge-wrap {
             position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 10px auto;
+            width: 65px;
+            height: 65px;
+            margin: 4px auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -214,8 +214,8 @@
 
         .badge-body {
             position: relative;
-            width: 72px;
-            height: 72px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             background: linear-gradient(135deg, #33240b 0%, #080401 100%);
             border: 2px solid var(--gold-main);
@@ -228,7 +228,7 @@
         }
 
         .badge-body i {
-            font-size: 34px;
+            font-size: 26px;
             background: linear-gradient(180deg, #FFF3A1 0%, #E0AA3E 60%, #8C5D0A 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -237,30 +237,60 @@
 
         /* 標題區域 */
         .title-area {
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         .title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 900;
             letter-spacing: 2px;
             background: linear-gradient(180deg, #ffffff 0%, #ffe899 40%, var(--gold-main) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             text-shadow: 0 4px 12px rgba(0,0,0,0.6);
         }
 
         .subtitle {
             color: #9d96b0;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 1px;
+        }
+
+        /* 新增：純視覺皇家徽章/桂冠裝飾（填補上方框，無文字） */
+        .royal-embellishment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px 0;
+            width: 100%;
+            opacity: 0.85;
+        }
+
+        .royal-line {
+            height: 1px;
+            flex: 1;
+            background: linear-gradient(90deg, transparent, var(--gold-main), transparent);
+        }
+
+        .royal-icon-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gold-light);
+            font-size: 12px;
+        }
+
+        .royal-icon-group i.fa-diamond {
+            font-size: 8px;
+            color: var(--gold-main);
         }
 
         /* 輸入框與按鈕區 */
         .form-area {
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         .custom-input {
@@ -268,10 +298,10 @@
             border: 1px solid rgba(224, 170, 62, 0.4) !important;
             color: var(--gold-light) !important;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13.5px;
             letter-spacing: 1px;
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             transition: all 0.3s ease;
         }
 
@@ -293,11 +323,11 @@
             border: none;
             color: #140b00;
             font-weight: 900;
-            font-size: 15px;
+            font-size: 14.5px;
             letter-spacing: 2px;
             border-radius: 12px;
-            padding: 13px;
-            box-shadow: 0 8px 25px rgba(224, 170, 62, 0.35);
+            padding: 11px;
+            box-shadow: 0 6px 20px rgba(224, 170, 62, 0.35);
             transition: all 0.25s ease;
             cursor: pointer;
             overflow: hidden;
@@ -317,6 +347,44 @@
             0% { left: -60%; }
             30% { left: 140%; }
             100% { left: 140%; }
+        }
+
+        /* 新增：純視覺幾何奢華黑金圖騰面板（填補下方框，無文字） */
+        .ornate-panel {
+            width: 100%;
+            height: 65px;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(224, 170, 62, 0.08) 0%, transparent 80%),
+                repeating-linear-gradient(45deg, rgba(224, 170, 62, 0.04) 0px, rgba(224, 170, 62, 0.04) 2px, transparent 2px, transparent 12px);
+            border: 1px solid rgba(224, 170, 62, 0.25);
+            border-radius: 14px;
+            margin-top: 6px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .ornate-panel::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(224, 170, 62, 0.4), transparent);
+        }
+
+        .ornate-center-icon {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--gold-main);
+            font-size: 14px;
+            z-index: 1;
+            background: #0d0718;
+            padding: 0 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(224, 170, 62, 0.2);
         }
 
         /* 刮刮卡區域 */
@@ -352,7 +420,7 @@
 
         .footer-note {
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             font-size: 11px;
             color: rgba(255, 255, 255, 0.3);
             letter-spacing: 1px;
@@ -397,12 +465,34 @@
                 <div class="title">牛老大專屬刮刮樂</div>
                 <div class="subtitle">請輸入專屬金鑰以兌換尊榮禮遇</div>
             </div>
+
+            <!-- 填補上方框：純視覺皇家圖騰點綴（完全無文字） -->
+            <div class="royal-embellishment">
+                <div class="royal-line"></div>
+                <div class="royal-icon-group">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-diamond"></i>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <i class="fa-solid fa-diamond"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="royal-line"></div>
+            </div>
         </div>
 
         <!-- 中間輸入表單區塊 -->
         <div class="form-area" id="loginForm">
-            <input type="text" id="keyInput" class="form-control custom-input mb-3 text-center" placeholder="請輸入兌換金鑰">
+            <input type="text" id="keyInput" class="form-control custom-input mb-2 text-center" placeholder="請輸入兌換金鑰">
             <button class="btn btn-gold w-100" id="loginBtn" onclick="handleLogin()">兌 換 尊 榮 好 禮</button>
+        </div>
+
+        <!-- 填補下方框：純視覺奢華幾何面板（完全無文字） -->
+        <div class="ornate-panel" id="ornatePanel">
+            <div class="ornate-center-icon">
+                <i class="fa-solid fa-gem"></i>
+                <i class="fa-solid fa-crown"></i>
+                <i class="fa-solid fa-award"></i>
+            </div>
         </div>
 
         <!-- 刮刮樂解鎖區域 -->
@@ -562,6 +652,7 @@
         await saveDB(db);
 
         document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('ornatePanel').style.display = 'none'; // 驗證成功後替換為刮刮卡
         document.getElementById('scratchContainer').style.display = 'block';
         document.getElementById('scratchHint').style.display = 'block';
         document.getElementById('prizeResult').innerText = item.prize;
