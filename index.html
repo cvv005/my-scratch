@@ -5,18 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>牛老大專屬刮刮樂</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold-primary: #f39c12;
-            --gold-light: #f1c40f;
-            --bg-dark: #0f0c20;
+            --gold-light: #ffe57f;
+            --gold-main: #ffc107;
+            --gold-dark: #ff8f00;
+            --bg-gradient: radial-gradient(circle at center, #1a102f 0%, #080511 100%);
         }
 
         * { font-family: 'Noto Sans TC', sans-serif; box-sizing: border-box; }
 
         body { 
-            background: #090714;
+            background: var(--bg-gradient);
             min-height: 100vh; 
             display: flex; 
             align-items: center; 
@@ -27,77 +29,96 @@
             overflow: hidden;
         }
 
-        /* 絢麗深色微光背景 */
-        .bg-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(243, 156, 18, 0.15) 0%, rgba(142, 68, 173, 0.1) 40%, transparent 70%);
+        /* 奢華金屬動態微光 */
+        .glow-aura {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(255, 193, 7, 0.18) 0%, rgba(255, 143, 0, 0.05) 50%, transparent 70%);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 0;
-            animation: pulse 6s ease-in-out infinite alternate;
+            animation: pulseAura 4s ease-in-out infinite alternate;
         }
 
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        @keyframes pulseAura {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
         }
 
-        /* 玻璃擬態主卡片 */
-        .card-box { 
+        /* 尊榮主卡片 */
+        .boss-card { 
             width: 90%; 
             max-width: 420px; 
-            padding: 40px 30px; 
+            padding: 45px 32px; 
             border-radius: 28px; 
-            background: rgba(22, 19, 43, 0.75);
+            background: rgba(23, 17, 40, 0.82);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 215, 0, 0.25);
+            border: 1px solid rgba(255, 215, 0, 0.3);
             box-shadow: 
-                0 30px 60px rgba(0, 0, 0, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                0 25px 50px rgba(0, 0, 0, 0.7),
+                0 0 30px rgba(255, 193, 7, 0.15),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15);
             text-align: center; 
             position: relative;
             z-index: 1;
         }
 
-        /* 質感 Emoji 標誌圈 */
-        .icon-badge {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
+        /* 鍍金皇冠勳章 */
+        .crown-badge {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 22px;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(243, 156, 18, 0.2), rgba(241, 196, 15, 0.05));
-            border: 1.5px solid rgba(243, 156, 18, 0.6);
+            background: radial-gradient(circle, rgba(255, 193, 7, 0.25) 0%, rgba(0, 0, 0, 0.4) 100%);
+            border: 2px solid var(--gold-main);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
+            box-shadow: 
+                0 0 25px rgba(255, 193, 7, 0.4),
+                inset 0 0 15px rgba(255, 193, 7, 0.3);
+            animation: floatBadge 3s ease-in-out infinite alternate;
         }
 
-        .title {
-            background: linear-gradient(135deg, #ffffff 0%, #ffeaa7 100%);
+        @keyframes floatBadge {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-6px); }
+        }
+
+        .crown-badge i {
+            font-size: 40px;
+            background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-dark) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 26px;
+            filter: drop-shadow(0 2px 8px rgba(255, 193, 7, 0.6));
+        }
+
+        /* 標題與內文 */
+        .title {
+            background: linear-gradient(135deg, #ffffff 0%, #ffecb3 50%, var(--gold-main) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 27px;
             font-weight: 900;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             margin-bottom: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
         }
 
         .subtitle {
-            color: #a0a5ba;
-            font-size: 14px;
-            margin-bottom: 28px;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 13.5px;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
         }
 
-        /* 現代輸入框 */
+        /* 輸入框 */
         .custom-input {
-            background: rgba(10, 8, 20, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            background: rgba(12, 8, 24, 0.7) !important;
+            border: 1px solid rgba(255, 193, 7, 0.35) !important;
             color: #ffffff !important;
             font-weight: bold;
             font-size: 15px;
@@ -107,54 +128,54 @@
         }
 
         .custom-input::placeholder {
-            color: #636b83 !important;
+            color: rgba(255, 255, 255, 0.3) !important;
             font-weight: normal;
         }
 
         .custom-input:focus {
-            border-color: var(--gold-primary) !important;
-            box-shadow: 0 0 15px rgba(243, 156, 18, 0.3) !important;
+            border-color: var(--gold-main) !important;
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.35) !important;
         }
 
-        /* 奢華漸層按鈕 */
+        /* 奢華金屬按鈕 */
         .btn-gold {
-            background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+            background: linear-gradient(135deg, #ffc107 0%, #ff8f00 50%, #c77700 100%);
             border: none;
-            color: #ffffff;
-            font-weight: 700;
+            color: #120a00;
+            font-weight: 900;
             font-size: 16px;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             border-radius: 14px;
             padding: 14px;
-            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 143, 0, 0.4);
             transition: all 0.3s ease;
         }
 
         .btn-gold:hover {
-            background: linear-gradient(135deg, #f1c40f 0%, #e67e22 100%);
-            box-shadow: 0 12px 30px rgba(243, 156, 18, 0.5);
+            background: linear-gradient(135deg, #ffe082 0%, #ffb300 100%);
+            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.6);
             transform: translateY(-2px);
-            color: #ffffff;
+            color: #000000;
         }
 
-        /* 刮刮區塊 */
+        /* 刮刮卡區域 */
         .scratch-container { 
             position: relative; 
-            width: 280px; 
-            height: 140px; 
+            width: 290px; 
+            height: 145px; 
             margin: 20px auto; 
             display: none; 
             border-radius: 16px; 
             overflow: hidden; 
-            border: 2px solid var(--gold-primary);
-            box-shadow: 0 0 25px rgba(243, 156, 18, 0.4);
+            border: 2px solid var(--gold-main);
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.45);
         }
 
         .prize-layer { 
             position: absolute; 
             width: 100%; 
             height: 100%; 
-            background: radial-gradient(circle, #2c1a32 0%, #0f0c20 100%); 
+            background: radial-gradient(circle, #2a1b40 0%, #0f0a1c 100%); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -173,11 +194,13 @@
 </head>
 <body>
 
-<div class="bg-glow"></div>
+<div class="glow-aura"></div>
 
-<div class="card-box">
-    <!-- 純霸氣牛頭 Emoji，絕不破圖 -->
-    <div class="icon-badge">🐂</div>
+<div class="boss-card">
+    <!-- 金屬立體皇冠 -->
+    <div class="crown-badge">
+        <i class="fa-solid fa-crown"></i>
+    </div>
 
     <h3 class="title">牛老大專屬刮刮樂</h3>
     <p class="subtitle">輸入專屬金鑰即可領取尊榮獎項</p>
@@ -190,12 +213,12 @@
     <div id="scratchSection">
         <div class="scratch-container" id="scratchContainer">
             <div class="prize-layer">
-                <div style="color: #a0a5ba; font-size: 12px; letter-spacing: 2px;">❖ 恭喜獲得獎項 ❖</div>
-                <div id="prizeResult" style="font-size: 26px; margin-top: 6px;"></div>
+                <div style="color: rgba(255, 255, 255, 0.6); font-size: 12px; letter-spacing: 2px;">❖ 恭喜獲得獎項 ❖</div>
+                <div id="prizeResult" style="font-size: 26px; margin-top: 6px; color: var(--gold-light);"></div>
             </div>
-            <canvas id="scratchCanvas" width="280" height="140"></canvas>
+            <canvas id="scratchCanvas" width="290" height="145"></canvas>
         </div>
-        <p id="scratchHint" class="text-warning small mt-2 fw-bold" style="display: none;">✨ 請滑動刮開塗層 ✨</p>
+        <p id="scratchHint" class="text-warning small mt-2 fw-bold" style="display: none;">✨ 請滑動刮開金色塗層 ✨</p>
     </div>
 </div>
 
@@ -277,17 +300,17 @@
         ctx = canvas.getContext('2d');
         ctx.globalCompositeOperation = 'source-over';
         
-        const grad = ctx.createLinearGradient(0, 0, 280, 140);
-        grad.addColorStop(0, '#f39c12');
-        grad.addColorStop(0.5, '#d35400');
-        grad.addColorStop(1, '#f1c40f');
+        const grad = ctx.createLinearGradient(0, 0, 290, 145);
+        grad.addColorStop(0, '#ffc107');
+        grad.addColorStop(0.5, '#ff8f00');
+        grad.addColorStop(1, '#ffe57f');
         ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 280, 140);
+        ctx.fillRect(0, 0, 290, 145);
         
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#120a00';
         ctx.font = 'bold 15px "Noto Sans TC"';
         ctx.textAlign = 'center';
-        ctx.fillText('✨ 滑動刮開圖層 ✨', 140, 75);
+        ctx.fillText('✨ 滑動刮開圖層 ✨', 145, 78);
 
         canvas.onmousedown = canvas.ontouchstart = () => { isDrawing = true; };
         canvas.onmouseup = canvas.ontouchend = () => { isDrawing = false; };
