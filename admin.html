@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>埃及神祇・管理員主機控制台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --egypt-gold: #ffd700;
+            --egypt-purple: #9b51e0;
+            --egypt-blue: #00d2ff;
+        }
+
+        * { font-family: 'Noto Sans TC', sans-serif; }
+
+        body { 
+            background: #0b0712;
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0; 
+            color: #ffffff;
+        }
+
+        .egypt-card { 
+            width: 90%; 
+            max-width: 500px; 
+            padding: 35px 25px; 
+            border-radius: 20px; 
+            background: rgba(12, 8, 20, 0.95);
+            border: 2px solid var(--egypt-gold);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+            text-align: center; 
+        }
+
+        .egypt-title {
+            color: var(--egypt-gold);
+            font-weight: 900;
+            text-shadow: 0 0 12px var(--egypt-gold);
+        }
+
+        .egypt-input {
+            background: rgba(10, 5, 20, 0.85) !important;
+            border: 1px solid var(--egypt-gold) !important;
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+
+        .btn-egypt {
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            border: none;
+            color: #1a0033;
+            font-weight: 900;
+        }
+
+        .list-group-item {
+            background: rgba(15, 5, 25, 0.8) !important;
+            border-color: rgba(255, 215, 0, 0.2) !important;
+            color: #ffffff !important;
+            font-size: 13px;
+        }
+
+        .badge-used { color: #ff4d4d; font-weight: bold; }
+        .badge-active { color: #00ff88; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="egypt-card">
+    
+    <!-- 登入驗證頁 -->
+    <div id="loginSection">
+        <h3 class="egypt-title mb-4">⚙️ 管理員密碼驗證</h3>
+        <input type="password" id="adminPwdInput" class="form-control egypt-input mb-3 text-center" placeholder="請輸入管理員密碼">
+        <button class="btn btn-egypt w-100 py-2 rounded-pill" onclick="checkAdminPassword()">登入後台</button>
+    </div>
+
+    <!-- 管理控制台 -->
+    <div id="adminPanel" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="egypt-title mb-0" style="font-size: 18px;">⚙️ 雲端主機控制台</h4>
+            <button class="btn btn-outline-warning btn-sm rounded-pill" onclick="logout()">登出</button>
+        </div>
+
+        <div class="card p-3 mb-3 text-start border-0" style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--egypt-gold) !important;">
+            <h6 class="text-warning fw-bold mb-2">🔑 手動新增額外授權金鑰：</h6>
+            <input type="text" id="customKeyInput" class="form-control egypt-input mb-2" placeholder="設定金鑰 (如: VIP888)">
+            <input type="text" id="prizeInput" class="form-control egypt-input mb-3" placeholder="設定金額 (如：$500)">
+            <button class="btn btn-egypt w-100 fw-bold rounded-3 mb-2" id="genBtn" onclick="generateSubAccount()">新增單組金鑰</button>
+        </div>
+
+        <div class="text-start">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="text-warning fw-bold mb-0">雲端授權紀錄：</h6>
+                <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" onclick="clearCloudData()">清空雲端資料</button>
+            </div>
+            <div style="max-height: 250px; overflow-y: auto;">
+                <ul id="keyList" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const JSONBIN_API_KEY = "$2a$10$92XGHP.lNCPqYGVXwVe1OO1/L4jOoI01kKN4TNQwrALhIOuj8tWwy";
+    const JSONBIN_BIN_ID = "6a89842df5f4af5e2934e74f";
+    const ADMIN_KEY = "cvv005"; // 管理員登入密碼
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+            showPanel();
+        }
+    });
+
+    function checkAdminPassword() {
+        const pwd = document.getElementById('adminPwdInput').value.trim();
+        if (pwd === ADMIN_KEY) {
+            sessionStorage.setItem('isAdminLoggedIn', 'true');
+            showPanel();
+        } else {
+            alert('❌ 密碼錯誤！');
+        }
+    }
+
+    function showPanel() {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        updateKeyList();
+    }
+
+    function logout() {
+        sessionStorage.removeItem('isAdminLoggedIn');
+        location.reload();
+    }
+
+    async function loadDB() {
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                method: 'GET',
+                headers: { 'X-Master-Key': JSONBIN_API_KEY, 'X-Bin-Meta': 'false' }
+            });
+            return await res.json();
+        } catch (e) {
+            return {};
+        }
+    }
+
+    async function saveDB(db) {
+        try {
+            await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+                body: JSON.stringify(db)
+            });
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async function generateSubAccount() {
+        const customKey = document.getElementById('customKeyInput').value.trim();
+        const prize = document.getElementById('prizeInput').value.trim();
+        if (!customKey || !prize) return alert('請填寫完整資訊！');
+
+        const btn = document.getElementById('genBtn');
+        btn.innerText = "同步中...";
+        btn.disabled = true;
+
+        const db = await loadDB();
+        db[customKey] = { prize: prize, isUsed: false };
+        await saveDB(db);
+
+        btn.innerText = "新增單組金鑰";
+        btn.disabled = false;
+
+        alert(`✅ 新增成功！\n金鑰：${customKey}\n金額：${prize}`);
+        document.getElementById('customKeyInput').value = '';
+        document.getElementById('prizeInput').value = '';
+        updateKeyList();
+    }
+
+    async function updateKeyList() {
+        const list = document.getElementById('keyList');
+        list.innerHTML = '<li class="list-group-item text-muted text-center">載入中...</li>';
+        
+        const db = await loadDB();
+        list.innerHTML = '';
+        const keys = Object.keys(db);
+
+        if (keys.length === 0) {
+            list.innerHTML = '<li class="list-group-item text-muted text-center">無紀錄</li>';
+            return;
+        }
+
+        for (let k of keys) {
+            const item = db[k];
+            const status = item.isUsed ? '<span class="badge-used">[已刮開]</span>' : '<span class="badge-active">[可使用]</span>';
+            list.innerHTML += `<li class="list-group-item d-flex justify-content-between align-items-center py-1.5">
+                <div><b>金鑰:</b> <span class="text-warning">${k}</span> (${item.prize}) ${status}</div>
+                <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="deleteItem('${k}')">刪除</button>
+            </li>`;
+        }
+    }
+
+    async function deleteItem(key) {
+        if (confirm(`確定刪除 [${key}]？`)) {
+            const db = await loadDB();
+            delete db[key];
+            await saveDB(db);
+            updateKeyList();
+        }
+    }
+
+    async function clearCloudData() {
+        if (confirm('確定清空所有資料？')) {
+            await saveDB({});
+            updateKeyList();
+        }
+    }
+</script>
+</body>
+</html>
