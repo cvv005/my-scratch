@@ -7,20 +7,30 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- Confetti 特效套件 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --gold-light: #fff3a1;
             --gold-main: #e0aa3e;
             --gold-dark: #8c5d0a;
-            --bg-dark: #06040a;
         }
 
         * { font-family: 'Noto Sans TC', sans-serif; box-sizing: border-box; }
 
         body { 
-            background: var(--bg-dark);
+            /* 1. 豐富的多重漸變背景：深紫紅與金色光暈交織 */
+            background: 
+                /* 極細金屬斜線網格紋理 */
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(224, 170, 62, 0.02) 0px,
+                    rgba(224, 170, 62, 0.02) 1px,
+                    transparent 1px,
+                    transparent 10px
+                ),
+                /* 中央金色尊榮聚光燈 */
+                radial-gradient(circle at 50% 45%, rgba(138, 93, 14, 0.35) 0%, rgba(38, 16, 56, 0.8) 50%, #06030a 100%);
+            background-attachment: fixed;
             min-height: 100vh; 
             display: flex; 
             flex-direction: column;
@@ -32,6 +42,37 @@
             overflow: hidden;
         }
 
+        /* 2. 背景旋轉金色光束 (Spotlight Rays) */
+        .bg-rays {
+            position: absolute;
+            width: 150vw;
+            height: 150vw;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                rgba(224, 170, 62, 0.05) 15deg,
+                transparent 30deg,
+                rgba(224, 170, 62, 0.05) 45deg,
+                transparent 60deg,
+                rgba(224, 170, 62, 0.05) 75deg,
+                transparent 90deg,
+                rgba(224, 170, 62, 0.05) 105deg,
+                transparent 120deg
+            );
+            border-radius: 50%;
+            animation: rotateRays 40s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rotateRays {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
         /* 滿版星空 Canvas */
         #bgCanvas {
             position: absolute;
@@ -41,36 +82,35 @@
             pointer-events: none;
         }
 
-        /* 頂部即時獲獎跑馬燈 (增加熱烈氛圍) */
+        /* 頂部即時獲獎跑馬燈 */
         .live-ticker {
             position: absolute;
             top: 25px;
             z-index: 10;
-            background: rgba(224, 170, 62, 0.12);
-            border: 1px solid rgba(224, 170, 62, 0.3);
+            background: rgba(224, 170, 62, 0.15);
+            border: 1px solid rgba(224, 170, 62, 0.4);
             border-radius: 30px;
-            padding: 8px 20px;
-            font-size: 12px;
+            padding: 8px 22px;
+            font-size: 12.5px;
             color: var(--gold-light);
             display: flex;
             align-items: center;
             gap: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            animation: fadeInDown 1s ease-out;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
 
         .ticker-dot {
             width: 8px; height: 8px;
             background-color: #2ecc71;
             border-radius: 50%;
-            box-shadow: 0 0 8px #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
             animation: blink 1.5s infinite alternate;
         }
 
         @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* 卡片外框（動態流光邊框） */
+        /* 卡片外框 */
         .card-wrapper {
             position: relative;
             width: 90%;
@@ -79,8 +119,8 @@
             padding: 2px;
             overflow: hidden;
             box-shadow: 
-                0 0 60px rgba(224, 170, 62, 0.22),
-                0 30px 80px rgba(0, 0, 0, 0.95);
+                0 0 70px rgba(224, 170, 62, 0.3),
+                0 30px 90px rgba(0, 0, 0, 0.95);
             z-index: 1;
         }
 
@@ -91,7 +131,7 @@
             width: 200%; height: 200%;
             background: conic-gradient(
                 transparent, 
-                rgba(255, 243, 161, 0.3), 
+                rgba(255, 243, 161, 0.35), 
                 var(--gold-main), 
                 transparent 45%
             );
@@ -106,14 +146,14 @@
         /* 主體黑金卡片 */
         .card-inner {
             position: relative;
-            background: linear-gradient(155deg, #1d142b 0%, #0c0716 100%);
+            background: linear-gradient(155deg, #1f1430 0%, #0d0718 100%);
             border-radius: 26px;
             padding: 45px 32px 40px;
             text-align: center;
             z-index: 2;
         }
 
-        /* 奢華雕花四角裝飾 */
+        /* 雕花四角裝飾 */
         .corner-pattern {
             position: absolute;
             width: 20px;
@@ -127,7 +167,7 @@
         .corner-bl { bottom: 14px; left: 14px; border-right: none; border-top: none; }
         .corner-br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
 
-        /* VIP 限定尊榮標籤 */
+        /* VIP 標籤 */
         .vip-tag {
             font-family: 'Cinzel', serif;
             font-size: 10px;
@@ -138,11 +178,11 @@
             padding: 3px 14px;
             display: inline-block;
             margin-bottom: 18px;
-            background: rgba(224, 170, 62, 0.08);
-            box-shadow: inset 0 0 10px rgba(224, 170, 62, 0.2);
+            background: rgba(224, 170, 62, 0.1);
+            box-shadow: inset 0 0 10px rgba(224, 170, 62, 0.25);
         }
 
-        /* 霸氣金牛雙角徽章 */
+        /* 金牛頭徽章 */
         .badge-wrap {
             position: relative;
             width: 90px;
@@ -157,13 +197,13 @@
             position: absolute;
             width: 100%; height: 100%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(224, 170, 62, 0.5) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(224, 170, 62, 0.6) 0%, transparent 70%);
             animation: pulseGlow 3s ease-in-out infinite alternate;
         }
 
         @keyframes pulseGlow {
-            0% { transform: scale(0.9); opacity: 0.4; }
-            100% { transform: scale(1.2); opacity: 0.9; }
+            0% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(1.25); opacity: 1; }
         }
 
         .badge-body {
@@ -171,7 +211,7 @@
             width: 82px;
             height: 82px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #2e210b 0%, #070401 100%);
+            background: linear-gradient(135deg, #33240b 0%, #080401 100%);
             border: 2px solid var(--gold-main);
             display: flex;
             align-items: center;
@@ -202,7 +242,7 @@
         }
 
         .subtitle {
-            color: #8c859d;
+            color: #9d96b0;
             font-size: 12.5px;
             letter-spacing: 1px;
             margin-bottom: 26px;
@@ -210,8 +250,8 @@
 
         /* 金屬質感輸入框 */
         .custom-input {
-            background: rgba(6, 4, 10, 0.75) !important;
-            border: 1px solid rgba(224, 170, 62, 0.35) !important;
+            background: rgba(6, 3, 10, 0.8) !important;
+            border: 1px solid rgba(224, 170, 62, 0.4) !important;
             color: var(--gold-light) !important;
             font-weight: 700;
             font-size: 15px;
@@ -233,7 +273,7 @@
             font-size: 13.5px;
         }
 
-        /* 耀金按鈕（光芒掃過特效） */
+        /* 按鈕 */
         .btn-gold {
             position: relative;
             background: linear-gradient(180deg, #ffe066 0%, #e0aa3e 50%, #b37e14 100%);
@@ -288,7 +328,7 @@
             position: absolute; 
             width: 100%; 
             height: 100%; 
-            background: radial-gradient(circle, #2e1a3d 0%, #0a0512 100%); 
+            background: radial-gradient(circle, #331d45 0%, #0d0617 100%); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -302,12 +342,11 @@
             transition: opacity 0.6s ease; 
         }
 
-        /* 底部註腳文字 */
         .footer-note {
             position: absolute;
             bottom: 20px;
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.3);
             letter-spacing: 1px;
             z-index: 10;
         }
@@ -315,7 +354,10 @@
 </head>
 <body>
 
-<!-- 動態星空與亮點粒子 Canvas -->
+<!-- 背景旋轉光束 -->
+<div class="bg-rays"></div>
+
+<!-- 動態星芒 Canvas -->
 <canvas id="bgCanvas"></canvas>
 
 <!-- 頂部即時廣播跑馬燈 -->
@@ -324,19 +366,16 @@
     <span id="tickerMsg">VIP 貴賓 ***9 號 剛剛刮中了 豪華獎項！</span>
 </div>
 
-<!-- 主卡片區域 -->
+<!-- 主卡片 -->
 <div class="card-wrapper">
     <div class="card-inner">
-        <!-- 雕花四角裝飾 -->
         <div class="corner-pattern corner-tl"></div>
         <div class="corner-pattern corner-tr"></div>
         <div class="corner-pattern corner-bl"></div>
         <div class="corner-pattern corner-br"></div>
 
-        <!-- VIP 標籤 -->
         <div class="vip-tag">VIP LIMITED EDITION</div>
 
-        <!-- 金牛頭徽章 -->
         <div class="badge-wrap">
             <div class="badge-glow"></div>
             <div class="badge-body">
@@ -347,18 +386,16 @@
         <div class="title">牛老大專屬刮刮樂</div>
         <div class="subtitle">請輸入專屬金鑰以兌換尊榮禮遇</div>
 
-        <!-- 輸入表單 -->
         <div id="loginForm">
             <input type="text" id="keyInput" class="form-control custom-input mb-3 text-center" placeholder="請輸入兌換金鑰">
             <button class="btn btn-gold w-100" id="loginBtn" onclick="handleLogin()">兌 換 尊 榮 好 禮</button>
         </div>
 
-        <!-- 刮刮樂區塊 -->
         <div id="scratchSection">
             <div class="scratch-container" id="scratchContainer">
                 <div class="prize-layer">
                     <i class="fa-solid fa-gem mb-1" style="color: var(--gold-light); font-size: 28px; filter: drop-shadow(0 2px 10px rgba(224,170,62,0.8));"></i>
-                    <div style="color: #8c859d; font-size: 11px; letter-spacing: 2px;">❖ 恭喜獲得尊榮獎項 ❖</div>
+                    <div style="color: #9d96b0; font-size: 11px; letter-spacing: 2px;">❖ 恭喜獲得尊榮獎項 ❖</div>
                     <div id="prizeResult" style="font-size: 24px; font-weight: 900; margin-top: 4px; color: var(--gold-light);"></div>
                 </div>
                 <canvas id="scratchCanvas" width="300" height="150"></canvas>
@@ -373,7 +410,7 @@
 <div class="footer-note">❖ 牛老大 VIP 尊榮邀請禮遇 ❖</div>
 
 <script>
-    // 1. 動態星空與閃爍粒子背景
+    // 動態十字符閃爍星芒
     const bgCanvas = document.getElementById('bgCanvas');
     const bgCtx = bgCanvas.getContext('2d');
     let particles = [];
@@ -385,15 +422,29 @@
     window.addEventListener('resize', resizeBg);
     resizeBg();
 
-    for(let i=0; i<80; i++) {
+    for(let i=0; i<70; i++) {
         particles.push({
             x: Math.random() * bgCanvas.width,
             y: Math.random() * bgCanvas.height,
-            r: Math.random() * 2 + 0.5,
+            size: Math.random() * 3 + 1,
             alpha: Math.random(),
-            speed: Math.random() * 0.3 + 0.1,
-            twinkleSpeed: Math.random() * 0.03 + 0.01
+            speed: Math.random() * 0.2 + 0.05,
+            twinkleSpeed: Math.random() * 0.02 + 0.005,
+            isSparkle: Math.random() > 0.6 // 40% 的粒子會呈現十字閃光
         });
+    }
+
+    function drawSparkle(x, y, size, alpha) {
+        bgCtx.strokeStyle = `rgba(255, 243, 161, ${alpha})`;
+        bgCtx.lineWidth = 0.8;
+        bgCtx.beginPath();
+        // 水平線
+        bgCtx.moveTo(x - size * 3, y);
+        bgCtx.lineTo(x + size * 3, y);
+        // 垂直線
+        bgCtx.moveTo(x, y - size * 3);
+        bgCtx.lineTo(x, y + size * 3);
+        bgCtx.stroke();
     }
 
     function drawBg() {
@@ -402,10 +453,18 @@
             p.alpha += p.twinkleSpeed;
             if (p.alpha > 1 || p.alpha < 0) p.twinkleSpeed = -p.twinkleSpeed;
 
+            const currentAlpha = Math.abs(p.alpha);
+
+            // 繪製圓點粒子
             bgCtx.beginPath();
-            bgCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-            bgCtx.fillStyle = `rgba(224, 170, 62, ${Math.abs(p.alpha)})`;
+            bgCtx.arc(p.x, p.y, p.size / 2, 0, Math.PI*2);
+            bgCtx.fillStyle = `rgba(224, 170, 62, ${currentAlpha})`;
             bgCtx.fill();
+
+            // 若為閃耀星芒，繪製十字光芒
+            if (p.isSparkle && currentAlpha > 0.4) {
+                drawSparkle(p.x, p.y, p.size, currentAlpha);
+            }
 
             p.y -= p.speed;
             if(p.y < 0) p.y = bgCanvas.height;
@@ -414,7 +473,7 @@
     }
     drawBg();
 
-    // 2. 跑馬燈動態隨機切換
+    // 跑馬燈
     const mockWinners = [
         "VIP 貴賓 8***6 剛剛刮中了 特等獎！",
         "VIP 貴賓 3***9 剛剛刮中了 尊榮好禮！",
@@ -427,7 +486,7 @@
         document.getElementById('tickerMsg').innerText = mockWinners[tickerIdx];
     }, 4000);
 
-    // 3. 業務 API 邏輯
+    // API 邏輯
     const JSONBIN_API_KEY = "$2a$10$92XGHP.lNCPqYGVXwVe1OO1/L4jOoI01kKN4TNQwrALhIOuj8tWwy";
     const JSONBIN_BIN_ID = "6a89842df5f4af5e2934e74f";
 
@@ -498,14 +557,13 @@
         initCanvas();
     }
 
-    // 4. 刮刮卡 + 金色慶祝噴發特效
+    // 刮刮卡邏輯
     let ctx, isDrawing = false, count = 0, isTriggeredConfetti = false;
     function initCanvas() {
         const canvas = document.getElementById('scratchCanvas');
         ctx = canvas.getContext('2d');
         ctx.globalCompositeOperation = 'source-over';
         
-        // 金屬沙金塗層
         const grad = ctx.createLinearGradient(0, 0, 300, 150);
         grad.addColorStop(0, '#e0aa3e');
         grad.addColorStop(0.3, '#fff3a1');
@@ -514,7 +572,6 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 300, 150);
 
-        // 閃粉顆粒壓紋
         for(let i=0; i<150; i++) {
             ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5})`;
             ctx.fillRect(Math.random()*300, Math.random()*150, 2, 2);
@@ -542,10 +599,9 @@
                 isTriggeredConfetti = true;
                 canvas.style.opacity = '0';
                 
-                // 觸發金色禮花噴發
                 confetti({
-                    particleCount: 100,
-                    spread: 70,
+                    particleCount: 120,
+                    spread: 80,
                     origin: { y: 0.6 },
                     colors: ['#ffe066', '#e0aa3e', '#ffffff']
                 });
