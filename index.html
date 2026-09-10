@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>牛老大專屬刮刮樂 - VIP尊榮限定</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -18,9 +18,7 @@
         * { font-family: 'Noto Sans TC', sans-serif; box-sizing: border-box; }
 
         body { 
-            /* 1. 豐富的多重漸變背景：深紫紅與金色光暈交織 */
             background: 
-                /* 極細金屬斜線網格紋理 */
                 repeating-linear-gradient(
                     45deg,
                     rgba(224, 170, 62, 0.02) 0px,
@@ -28,7 +26,6 @@
                     transparent 1px,
                     transparent 10px
                 ),
-                /* 中央金色尊榮聚光燈 */
                 radial-gradient(circle at 50% 45%, rgba(138, 93, 14, 0.35) 0%, rgba(38, 16, 56, 0.8) 50%, #06030a 100%);
             background-attachment: fixed;
             min-height: 100vh; 
@@ -37,16 +34,17 @@
             align-items: center; 
             justify-content: center; 
             margin: 0; 
+            padding: 20px 0;
             color: #ffffff;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* 2. 背景旋轉金色光束 (Spotlight Rays) */
+        /* 背景旋轉光束 */
         .bg-rays {
             position: absolute;
-            width: 150vw;
-            height: 150vw;
+            width: 160vw;
+            height: 160vw;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -73,7 +71,6 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        /* 滿版星空 Canvas */
         #bgCanvas {
             position: absolute;
             top: 0; left: 0;
@@ -82,39 +79,41 @@
             pointer-events: none;
         }
 
-        /* 頂部即時獲獎跑馬燈 */
+        /* 頂部即時跑馬燈 */
         .live-ticker {
             position: absolute;
-            top: 25px;
+            top: 18px;
             z-index: 10;
             background: rgba(224, 170, 62, 0.15);
             border: 1px solid rgba(224, 170, 62, 0.4);
             border-radius: 30px;
-            padding: 8px 22px;
-            font-size: 12.5px;
+            padding: 6px 18px;
+            font-size: 12px;
             color: var(--gold-light);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             backdrop-filter: blur(12px);
             box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
 
         .ticker-dot {
-            width: 8px; height: 8px;
+            width: 7px; height: 7px;
             background-color: #2ecc71;
             border-radius: 50%;
-            box-shadow: 0 0 10px #2ecc71;
+            box-shadow: 0 0 8px #2ecc71;
             animation: blink 1.5s infinite alternate;
         }
 
         @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* 卡片外框 */
+        /* 核心修改：指定 9:16 直立卡片尺寸 */
         .card-wrapper {
             position: relative;
-            width: 90%;
-            max-width: 440px;
+            width: 360px;          /* 精準 9:16 寬度 */
+            height: 640px;         /* 精準 9:16 高度 */
+            max-width: 90vw;
+            max-height: 85vh;
             border-radius: 28px;
             padding: 2px;
             overflow: hidden;
@@ -122,6 +121,7 @@
                 0 0 70px rgba(224, 170, 62, 0.3),
                 0 30px 90px rgba(0, 0, 0, 0.95);
             z-index: 1;
+            margin-top: 15px;
         }
 
         .card-wrapper::before {
@@ -146,18 +146,24 @@
         /* 主體黑金卡片 */
         .card-inner {
             position: relative;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(155deg, #1f1430 0%, #0d0718 100%);
             border-radius: 26px;
-            padding: 45px 32px 40px;
+            padding: 35px 24px 30px;
             text-align: center;
             z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* 均勻拉開上下內容，滿版佈局 */
+            align-items: center;
         }
 
         /* 雕花四角裝飾 */
         .corner-pattern {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 2px solid var(--gold-main);
             opacity: 0.6;
             pointer-events: none;
@@ -167,27 +173,26 @@
         .corner-bl { bottom: 14px; left: 14px; border-right: none; border-top: none; }
         .corner-br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
 
-        /* VIP 標籤 */
         .vip-tag {
             font-family: 'Cinzel', serif;
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: 3px;
             color: var(--gold-main);
             border: 1px solid rgba(224, 170, 62, 0.4);
             border-radius: 20px;
-            padding: 3px 14px;
+            padding: 4px 16px;
             display: inline-block;
-            margin-bottom: 18px;
             background: rgba(224, 170, 62, 0.1);
             box-shadow: inset 0 0 10px rgba(224, 170, 62, 0.25);
+            margin-bottom: 10px;
         }
 
-        /* 金牛頭徽章 */
+        /* 徽章放大立體感 */
         .badge-wrap {
             position: relative;
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 18px;
+            width: 100px;
+            height: 100px;
+            margin: 15px auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -208,8 +213,8 @@
 
         .badge-body {
             position: relative;
-            width: 82px;
-            height: 82px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             background: linear-gradient(135deg, #33240b 0%, #080401 100%);
             border: 2px solid var(--gold-main);
@@ -222,16 +227,20 @@
         }
 
         .badge-body i {
-            font-size: 38px;
+            font-size: 42px;
             background: linear-gradient(180deg, #FFF3A1 0%, #E0AA3E 60%, #8C5D0A 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 3px 6px rgba(0,0,0,0.9));
         }
 
-        /* 標題與內文 */
+        /* 標題區域 */
+        .title-area {
+            margin-bottom: 20px;
+        }
+
         .title {
-            font-size: 27px;
+            font-size: 26px;
             font-weight: 900;
             letter-spacing: 2px;
             background: linear-gradient(180deg, #ffffff 0%, #ffe899 40%, var(--gold-main) 100%);
@@ -243,12 +252,17 @@
 
         .subtitle {
             color: #9d96b0;
-            font-size: 12.5px;
+            font-size: 13px;
             letter-spacing: 1px;
-            margin-bottom: 26px;
         }
 
-        /* 金屬質感輸入框 */
+        /* 輸入框與按鈕區 */
+        .form-area {
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
         .custom-input {
             background: rgba(6, 3, 10, 0.8) !important;
             border: 1px solid rgba(224, 170, 62, 0.4) !important;
@@ -268,12 +282,11 @@
         }
 
         .custom-input::placeholder {
-            color: rgba(255, 255, 255, 0.25) !important;
+            color: rgba(255, 255, 255, 0.3) !important;
             font-weight: 400;
-            font-size: 13.5px;
+            font-size: 13px;
         }
 
-        /* 按鈕 */
         .btn-gold {
             position: relative;
             background: linear-gradient(180deg, #ffe066 0%, #e0aa3e 50%, #b37e14 100%);
@@ -306,17 +319,12 @@
             100% { left: 140%; }
         }
 
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(224, 170, 62, 0.55);
-        }
-
         /* 刮刮卡區域 */
         .scratch-container { 
             position: relative; 
-            width: 300px; 
+            width: 280px; 
             height: 150px; 
-            margin: 15px auto 0; 
+            margin: 10px auto 0; 
             display: none; 
             border-radius: 16px; 
             overflow: hidden; 
@@ -344,7 +352,7 @@
 
         .footer-note {
             position: absolute;
-            bottom: 20px;
+            bottom: 12px;
             font-size: 11px;
             color: rgba(255, 255, 255, 0.3);
             letter-spacing: 1px;
@@ -360,13 +368,13 @@
 <!-- 動態星芒 Canvas -->
 <canvas id="bgCanvas"></canvas>
 
-<!-- 頂部即時廣播跑馬燈 -->
+<!-- 頂部跑馬燈 -->
 <div class="live-ticker">
     <div class="ticker-dot"></div>
     <span id="tickerMsg">VIP 貴賓 ***9 號 剛剛刮中了 豪華獎項！</span>
 </div>
 
-<!-- 主卡片 -->
+<!-- 9:16 直立卡片 -->
 <div class="card-wrapper">
     <div class="card-inner">
         <div class="corner-pattern corner-tl"></div>
@@ -374,43 +382,51 @@
         <div class="corner-pattern corner-bl"></div>
         <div class="corner-pattern corner-br"></div>
 
-        <div class="vip-tag">VIP LIMITED EDITION</div>
+        <!-- 頂部區塊 -->
+        <div>
+            <div class="vip-tag">VIP LIMITED EDITION</div>
 
-        <div class="badge-wrap">
-            <div class="badge-glow"></div>
-            <div class="badge-body">
-                <i class="fa-solid fa-crown"></i>
+            <div class="badge-wrap">
+                <div class="badge-glow"></div>
+                <div class="badge-body">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+            </div>
+
+            <div class="title-area">
+                <div class="title">牛老大專屬刮刮樂</div>
+                <div class="subtitle">請輸入專屬金鑰以兌換尊榮禮遇</div>
             </div>
         </div>
 
-        <div class="title">牛老大專屬刮刮樂</div>
-        <div class="subtitle">請輸入專屬金鑰以兌換尊榮禮遇</div>
-
-        <div id="loginForm">
+        <!-- 中間輸入表單區塊 -->
+        <div class="form-area" id="loginForm">
             <input type="text" id="keyInput" class="form-control custom-input mb-3 text-center" placeholder="請輸入兌換金鑰">
             <button class="btn btn-gold w-100" id="loginBtn" onclick="handleLogin()">兌 換 尊 榮 好 禮</button>
         </div>
 
-        <div id="scratchSection">
+        <!-- 刮刮樂解鎖區域 -->
+        <div id="scratchSection" style="margin-bottom: 10px;">
             <div class="scratch-container" id="scratchContainer">
                 <div class="prize-layer">
                     <i class="fa-solid fa-gem mb-1" style="color: var(--gold-light); font-size: 28px; filter: drop-shadow(0 2px 10px rgba(224,170,62,0.8));"></i>
                     <div style="color: #9d96b0; font-size: 11px; letter-spacing: 2px;">❖ 恭喜獲得尊榮獎項 ❖</div>
-                    <div id="prizeResult" style="font-size: 24px; font-weight: 900; margin-top: 4px; color: var(--gold-light);"></div>
+                    <div id="prizeResult" style="font-size: 22px; font-weight: 900; margin-top: 4px; color: var(--gold-light);"></div>
                 </div>
-                <canvas id="scratchCanvas" width="300" height="150"></canvas>
+                <canvas id="scratchCanvas" width="280" height="150"></canvas>
             </div>
-            <p id="scratchHint" style="display: none; color: var(--gold-light); font-size: 13px; margin-top: 14px; font-weight: bold; letter-spacing: 1px;">
+            <p id="scratchHint" style="display: none; color: var(--gold-light); font-size: 12.5px; margin-top: 12px; font-weight: bold; letter-spacing: 1px;">
                 ✨ 請滑動刮開金色塗層 ✨
             </p>
         </div>
+
     </div>
 </div>
 
 <div class="footer-note">❖ 牛老大 VIP 尊榮邀請禮遇 ❖</div>
 
 <script>
-    // 動態十字符閃爍星芒
+    // 星芒繪製
     const bgCanvas = document.getElementById('bgCanvas');
     const bgCtx = bgCanvas.getContext('2d');
     let particles = [];
@@ -430,7 +446,7 @@
             alpha: Math.random(),
             speed: Math.random() * 0.2 + 0.05,
             twinkleSpeed: Math.random() * 0.02 + 0.005,
-            isSparkle: Math.random() > 0.6 // 40% 的粒子會呈現十字閃光
+            isSparkle: Math.random() > 0.6
         });
     }
 
@@ -438,10 +454,8 @@
         bgCtx.strokeStyle = `rgba(255, 243, 161, ${alpha})`;
         bgCtx.lineWidth = 0.8;
         bgCtx.beginPath();
-        // 水平線
         bgCtx.moveTo(x - size * 3, y);
         bgCtx.lineTo(x + size * 3, y);
-        // 垂直線
         bgCtx.moveTo(x, y - size * 3);
         bgCtx.lineTo(x, y + size * 3);
         bgCtx.stroke();
@@ -455,13 +469,11 @@
 
             const currentAlpha = Math.abs(p.alpha);
 
-            // 繪製圓點粒子
             bgCtx.beginPath();
             bgCtx.arc(p.x, p.y, p.size / 2, 0, Math.PI*2);
             bgCtx.fillStyle = `rgba(224, 170, 62, ${currentAlpha})`;
             bgCtx.fill();
 
-            // 若為閃耀星芒，繪製十字光芒
             if (p.isSparkle && currentAlpha > 0.4) {
                 drawSparkle(p.x, p.y, p.size, currentAlpha);
             }
@@ -564,23 +576,23 @@
         ctx = canvas.getContext('2d');
         ctx.globalCompositeOperation = 'source-over';
         
-        const grad = ctx.createLinearGradient(0, 0, 300, 150);
+        const grad = ctx.createLinearGradient(0, 0, 280, 150);
         grad.addColorStop(0, '#e0aa3e');
         grad.addColorStop(0.3, '#fff3a1');
         grad.addColorStop(0.7, '#9e6d0f');
         grad.addColorStop(1, '#ffe066');
         ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 300, 150);
+        ctx.fillRect(0, 0, 280, 150);
 
-        for(let i=0; i<150; i++) {
+        for(let i=0; i<120; i++) {
             ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5})`;
-            ctx.fillRect(Math.random()*300, Math.random()*150, 2, 2);
+            ctx.fillRect(Math.random()*280, Math.random()*150, 2, 2);
         }
         
         ctx.fillStyle = '#140b00';
-        ctx.font = 'bold 16px "Noto Sans TC"';
+        ctx.font = 'bold 15px "Noto Sans TC"';
         ctx.textAlign = 'center';
-        ctx.fillText('❖ 刮開圖層 領取好禮 ❖', 150, 82);
+        ctx.fillText('❖ 刮開圖層 領取好禮 ❖', 140, 80);
 
         canvas.onmousedown = canvas.ontouchstart = () => { isDrawing = true; };
         canvas.onmouseup = canvas.ontouchend = () => { isDrawing = false; };
@@ -591,7 +603,7 @@
             const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(x, y, 22, 0, Math.PI * 2);
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
             ctx.fill();
             
             count++;
