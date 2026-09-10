@@ -10,13 +10,13 @@
         :root {
             --boss-gold: #ffd700;
             --boss-red: #ff2200;
-            --boss-glow: rgba(255, 215, 0, 0.6);
+            --boss-dark: #0d0202;
         }
 
         * { font-family: 'Noto Sans TC', sans-serif; }
 
         body { 
-            background: #000;
+            background: #050000;
             min-height: 100vh; 
             display: flex; 
             align-items: center; 
@@ -27,84 +27,75 @@
             overflow: hidden;
         }
 
-        /* 霸氣牛頭人背景 */
+        /* 炫酷闇黑網格與紅光 background */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=1920&auto=format&fit=crop'); /* 質感暗黑底圖 */
-            background-size: cover;
-            background-position: center;
+            background: 
+                radial-gradient(circle at 50% 30%, rgba(255, 34, 0, 0.25) 0%, rgba(0,0,0,0.95) 70%),
+                linear-gradient(rgba(255, 215, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 215, 0, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
             z-index: -2;
-            filter: brightness(0.4) contrast(1.2);
-            transform: scale(1.05);
-            transition: all 0.5s ease;
         }
 
-        /* 暗黑金屬質感罩層與光芒 */
-        body::before {
-            content: "";
+        /* 中央牛頭人刺青光芒圖騰 */
+        .bull-aura {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at center, rgba(139, 0, 0, 0.4) 0%, rgba(0,0,0,0.85) 80%),
-                linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(20,0,0,0.9));
-            z-index: -1;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(255,0,0,0.2) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+            animation: pulseAura 3s infinite alternate;
+        }
+
+        @keyframes pulseAura {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
         }
 
         .boss-card { 
             width: 90%; 
-            max-width: 460px; 
-            padding: 40px 28px; 
-            border-radius: 24px; 
-            background: rgba(15, 5, 5, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            max-width: 440px; 
+            padding: 35px 25px; 
+            border-radius: 20px; 
+            background: rgba(20, 5, 5, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 2px solid var(--boss-gold);
             box-shadow: 
-                0 0 35px rgba(255, 215, 0, 0.35),
-                0 0 15px rgba(255, 34, 0, 0.4),
-                inset 0 0 25px rgba(255, 215, 0, 0.15);
+                0 0 30px rgba(255, 215, 0, 0.4),
+                inset 0 0 20px rgba(255, 34, 0, 0.3);
             text-align: center; 
             position: relative;
             z-index: 1;
-            animation: cardGlow 4s infinite alternate;
         }
 
-        @keyframes cardGlow {
-            0% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.3), inset 0 0 15px rgba(255, 34, 0, 0.3); }
-            100% { box-shadow: 0 0 45px rgba(255, 215, 0, 0.6), inset 0 0 30px rgba(255, 34, 0, 0.5); }
-        }
-
-        .boss-avatar {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 15px;
-            border-radius: 50%;
-            background: url('https://i.postimg.cc/mD8zQyFq/bull-boss.png') center/cover no-repeat, #2b0000;
-            border: 3px solid var(--boss-gold);
-            box-shadow: 0 0 20px var(--boss-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 45px;
+        /* 牛頭標誌圖騰 */
+        .bull-icon {
+            font-size: 55px;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ff2200, 0 0 10px #ffd700;
+            filter: drop-shadow(0px 0px 10px rgba(255,0,0,0.8));
         }
 
         .boss-title {
             color: var(--boss-gold);
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 900;
-            text-shadow: 0 0 12px var(--boss-gold), 0 0 20px var(--boss-red);
-            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--boss-gold), 0 0 20px var(--boss-red);
+            letter-spacing: 2px;
         }
 
         .boss-input {
-            background: rgba(0, 0, 0, 0.7) !important;
+            background: rgba(0, 0, 0, 0.8) !important;
             border: 1.5px solid var(--boss-gold) !important;
             color: #ffffff !important;
             font-weight: bold;
-            font-size: 16px;
             box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2);
-            transition: all 0.3s ease;
         }
 
         .boss-input::placeholder {
@@ -112,17 +103,11 @@
             font-size: 14px;
         }
 
-        .boss-input:focus {
-            border-color: #ff5500 !important;
-            box-shadow: 0 0 20px rgba(255, 85, 0, 0.8) !important;
-        }
-
         .btn-boss {
-            background: linear-gradient(135deg, #ffe066, #d4af37, #996515);
+            background: linear-gradient(135deg, #ffd700, #b8860b);
             border: none;
-            color: #1a0000;
+            color: #2b0000;
             font-weight: 900;
-            font-size: 17px;
             letter-spacing: 2px;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
             transition: all 0.3s ease;
@@ -132,7 +117,6 @@
             background: linear-gradient(135deg, #ffffff, #ffd700);
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
             transform: translateY(-2px);
-            color: #000;
         }
 
         .scratch-container { 
@@ -172,15 +156,16 @@
 <body>
 
 <div class="bg-layer"></div>
+<div class="bull-aura"></div>
 
 <div class="boss-card">
-    <div class="boss-avatar">🐂</div>
-    <h3 class="boss-title mb-2">牛老大專屬刮刮樂</h3>
+    <div class="bull-icon">🐂</div>
+    <h3 class="boss-title mb-3">牛老大專屬刮刮樂</h3>
     
     <div id="loginForm">
-        <p class="text-warning small mb-4" style="letter-spacing: 1px;">請輸入專屬兌換金鑰以領取尊榮獎項</p>
+        <p class="text-warning small mb-3">請輸入專屬兌換金鑰以領取尊榮獎項：</p>
         
-        <input type="text" id="keyInput" class="form-control boss-input mb-3 text-center fw-bold py-2" placeholder="請輸入專屬金鑰" style="letter-spacing: 2px;">
+        <input type="text" id="keyInput" class="form-control boss-input mb-3 text-center fw-bold py-2" placeholder="請輸入專屬金鑰">
         
         <button class="btn btn-boss w-100 py-2.5 rounded-pill" id="loginBtn" onclick="handleLogin()">兌 換 尊 榮 好 禮</button>
     </div>
