@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>埃及神祇・管理員主機控制台</title>
+    <title>牛老大刮刮樂・管理員控制台</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --egypt-gold: #ffd700;
-            --egypt-purple: #9b51e0;
-            --egypt-blue: #00d2ff;
+            --boss-gold: #ffd700;
+            --boss-red: #8b0000;
         }
 
         * { font-family: 'Noto Sans TC', sans-serif; }
 
         body { 
-            background: #0b0712;
+            background: #0d0202;
             min-height: 100vh; 
             display: flex; 
             align-items: center; 
@@ -25,39 +24,39 @@
             color: #ffffff;
         }
 
-        .egypt-card { 
+        .boss-card { 
             width: 90%; 
             max-width: 500px; 
             padding: 35px 25px; 
             border-radius: 20px; 
-            background: rgba(12, 8, 20, 0.95);
-            border: 2px solid var(--egypt-gold);
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+            background: rgba(20, 5, 5, 0.95);
+            border: 2px solid var(--boss-gold);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
             text-align: center; 
         }
 
-        .egypt-title {
-            color: var(--egypt-gold);
+        .boss-title {
+            color: var(--boss-gold);
             font-weight: 900;
-            text-shadow: 0 0 12px var(--egypt-gold);
+            text-shadow: 0 0 12px var(--boss-gold);
         }
 
-        .egypt-input {
-            background: rgba(10, 5, 20, 0.85) !important;
-            border: 1px solid var(--egypt-gold) !important;
+        .boss-input {
+            background: rgba(15, 3, 3, 0.85) !important;
+            border: 1px solid var(--boss-gold) !important;
             color: #ffffff !important;
             font-weight: bold;
         }
 
-        .btn-egypt {
+        .btn-boss {
             background: linear-gradient(135deg, #ffd700, #b8860b);
             border: none;
-            color: #1a0033;
+            color: #2b0000;
             font-weight: 900;
         }
 
         .list-group-item {
-            background: rgba(15, 5, 25, 0.8) !important;
+            background: rgba(20, 5, 5, 0.8) !important;
             border-color: rgba(255, 215, 0, 0.2) !important;
             color: #ffffff !important;
             font-size: 13px;
@@ -69,27 +68,27 @@
 </head>
 <body>
 
-<div class="egypt-card">
+<div class="boss-card">
     
     <!-- 登入驗證頁 -->
     <div id="loginSection">
-        <h3 class="egypt-title mb-4">⚙️ 管理員密碼驗證</h3>
-        <input type="password" id="adminPwdInput" class="form-control egypt-input mb-3 text-center" placeholder="請輸入管理員密碼">
-        <button class="btn btn-egypt w-100 py-2 rounded-pill" onclick="checkAdminPassword()">登入後台</button>
+        <h3 class="boss-title mb-4">🐂 牛老大管理員驗證</h3>
+        <input type="password" id="adminPwdInput" class="form-control boss-input mb-3 text-center" placeholder="請輸入管理員密碼">
+        <button class="btn btn-boss w-100 py-2 rounded-pill" onclick="checkAdminPassword()">登入後台</button>
     </div>
 
     <!-- 管理控制台 -->
     <div id="adminPanel" style="display: none;">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="egypt-title mb-0" style="font-size: 18px;">⚙️ 雲端主機控制台</h4>
+            <h4 class="boss-title mb-0" style="font-size: 18px;">⚙️ 控制台主機</h4>
             <button class="btn btn-outline-warning btn-sm rounded-pill" onclick="logout()">登出</button>
         </div>
 
-        <div class="card p-3 mb-3 text-start border-0" style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--egypt-gold) !important;">
+        <div class="card p-3 mb-3 text-start border-0" style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--boss-gold) !important;">
             <h6 class="text-warning fw-bold mb-2">🔑 手動新增額外授權金鑰：</h6>
-            <input type="text" id="customKeyInput" class="form-control egypt-input mb-2" placeholder="設定金鑰 (如: VIP888)">
-            <input type="text" id="prizeInput" class="form-control egypt-input mb-3" placeholder="設定金額 (如：$500)">
-            <button class="btn btn-egypt w-100 fw-bold rounded-3 mb-2" id="genBtn" onclick="generateSubAccount()">新增單組金鑰</button>
+            <input type="text" id="customKeyInput" class="form-control boss-input mb-2" placeholder="設定金鑰 (如: VIP888)">
+            <input type="text" id="prizeInput" class="form-control boss-input mb-3" placeholder="設定金額 (如：$500)">
+            <button class="btn btn-boss w-100 fw-bold rounded-3 mb-2" id="genBtn" onclick="generateSubAccount()">新增單組金鑰</button>
         </div>
 
         <div class="text-start">
