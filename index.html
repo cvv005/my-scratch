@@ -27,33 +27,32 @@
             overflow: hidden;
         }
 
-        /* 炫酷闇黑網格與紅光 background */
+        /* 霸氣地獄紅光與暗黑網格背景 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: 
-                radial-gradient(circle at 50% 30%, rgba(255, 34, 0, 0.25) 0%, rgba(0,0,0,0.95) 70%),
-                linear-gradient(rgba(255, 215, 0, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 215, 0, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
+                radial-gradient(circle at 50% 40%, rgba(180, 0, 0, 0.35) 0%, rgba(5,0,0,0.95) 75%),
+                linear-gradient(rgba(255, 215, 0, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 215, 0, 0.04) 1px, transparent 1px);
+            background-size: 100% 100%, 35px 35px, 35px 35px;
             z-index: -2;
         }
 
-        /* 中央牛頭人刺青光芒圖騰 */
         .bull-aura {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(255,0,0,0.2) 0%, transparent 70%);
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255, 34, 0, 0.25) 0%, transparent 70%);
             z-index: 0;
             pointer-events: none;
-            animation: pulseAura 3s infinite alternate;
+            animation: pulseAura 2.5s infinite alternate ease-in-out;
         }
 
         @keyframes pulseAura {
-            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.4; }
+            100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.9; }
         }
 
         .boss-card { 
@@ -61,7 +60,7 @@
             max-width: 440px; 
             padding: 35px 25px; 
             border-radius: 20px; 
-            background: rgba(20, 5, 5, 0.85);
+            background: rgba(18, 4, 4, 0.88);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 2px solid var(--boss-gold);
@@ -73,13 +72,25 @@
             z-index: 1;
         }
 
-        /* 牛頭標誌圖騰 */
-        .bull-icon {
-            font-size: 55px;
-            line-height: 1;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px #ff2200, 0 0 10px #ffd700;
-            filter: drop-shadow(0px 0px 10px rgba(255,0,0,0.8));
+        /* 原生 SVG 牛頭勳章 */
+        .bull-badge {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #3a0000 0%, #100000 100%);
+            border: 2px solid var(--boss-gold);
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.8), inset 0 0 10px rgba(255, 34, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bull-badge svg {
+            width: 52px;
+            height: 52px;
+            fill: var(--boss-gold);
+            filter: drop-shadow(0px 0px 6px rgba(255, 34, 0, 0.9));
         }
 
         .boss-title {
@@ -91,7 +102,7 @@
         }
 
         .boss-input {
-            background: rgba(0, 0, 0, 0.8) !important;
+            background: rgba(0, 0, 0, 0.85) !important;
             border: 1.5px solid var(--boss-gold) !important;
             color: #ffffff !important;
             font-weight: bold;
@@ -159,7 +170,13 @@
 <div class="bull-aura"></div>
 
 <div class="boss-card">
-    <div class="bull-icon">🐂</div>
+    <!-- 純 SVG 金屬牛頭圖騰，不需載入圖床 -->
+    <div class="bull-badge">
+        <svg viewBox="0 0 24 24">
+            <path d="M12,2 C12,2 14,5 17,5 C20,5 22,2 22,2 C22,7 19,10 18,12 C19,14 20,16 19,18 C18,20 15,22 12,22 C9,22 6,20 5,18 C4,16 5,14 6,12 C5,10 2,7 2,2 C2,2 4,5 7,5 C10,5 12,2 12,2 Z M12,7 C10,7 8.5,8.5 8.5,10 C8.5,11.5 10,13 12,13 C14,13 15.5,11.5 15.5,10 C15.5,8.5 14,7 12,7 Z" />
+        </svg>
+    </div>
+
     <h3 class="boss-title mb-3">牛老大專屬刮刮樂</h3>
     
     <div id="loginForm">
